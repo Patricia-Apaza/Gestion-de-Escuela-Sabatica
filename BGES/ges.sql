@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 14, 2025 at 11:24 AM
+-- Generation Time: Sep 15, 2025 at 01:27 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -73,14 +73,14 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre_completo`, `dni`, `correo`, `contraseña`, `rol`, `estado`, `facultad_carrera`, `fecha_creacion`, `fecha_modificacion`, `creado_por`, `modificado_por`, `grupo_asignado`, `acceso_temporal_hasta`, `direccion`, `fecha_nacimiento`, `intentos_fallidos`, `observaciones`, `telefono`, `ultimo_acceso`) VALUES
-(1, 'Super Administrador', '12345678', 'superadmin@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'SUPERADMIN', 'ACTIVO', NULL, '2025-09-14 09:37:37', '2025-09-14 09:37:37', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(2, 'Admin Ingeniería', '87654321', 'admin.ing@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:37:37', '2025-09-14 09:37:37', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 'Admin Teología', '11122233', 'admin.teo@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN', 'ACTIVO', 'Teología', '2025-09-14 09:37:37', '2025-09-14 09:37:37', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(4, 'Líder Grupo A', '33344455', 'lider.a@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'LIDER', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-14 09:44:22', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(5, 'Líder Grupo B', '44455566', 'lider.b@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'LIDER', 'ACTIVO', 'Teología', '2025-09-14 09:44:22', '2025-09-14 09:44:22', NULL, NULL, 'Grupo B - Teología', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(6, 'Juan Pérez', '55667788', 'juan.perez@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'INTEGRANTE', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-14 09:44:22', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(7, 'María García', '66778899', 'maria.garcia@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'INTEGRANTE', 'ACTIVO', 'Teología', '2025-09-14 09:44:22', '2025-09-14 09:44:22', NULL, NULL, 'Grupo B - Teología', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(8, 'Carlos López', '77889900', 'carlos.lopez@ges.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'INTEGRANTE', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-14 09:44:22', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(1, 'Super Administrador', '12345678', 'superadmin@upeu.edu.pe', '$2a$10$upO.JBu9vLaXVkAm/guOxOlUTvXEQTAixWPwIj0G9N3Hm7lMtV58O', 'SUPERADMIN', 'ACTIVO', NULL, '2025-09-14 09:37:37', '2025-09-15 13:20:43', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:20:43.215632'),
+(2, 'Admin Ingeniería', '87654321', 'admin.ing@upeu.edu.pe', '$2a$10$ATKkWlRSao49q5FvRh/qeenAgC9JPJ5mj5X2Yj8OwxkuRDU4cs/Ye', 'ADMIN', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:37:37', '2025-09-15 13:23:42', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:23:42.189944'),
+(3, 'Admin Teología', '11122233', 'admin.teo@upeu.edu.pe', '$2a$10$A7cmJc2ToK21z..PTX.SDe0n8Sr1GSngcpFeoQrd9BKELjVlxAcwi', 'ADMIN', 'ACTIVO', 'Teología', '2025-09-14 09:37:37', '2025-09-15 13:24:04', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:24:04.131294'),
+(4, 'Líder Grupo A', '33344455', 'lider.a@upeu.edu.pe', '$2a$10$jjxsR6N8wLhuHKkPihMhNOyiMNZ476WKlHDnL2DqECMsTa82QSGOm', 'LIDER', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-15 13:23:14', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:23:14.204620'),
+(5, 'Líder Grupo B', '44455566', 'lider.b@upeu.edu.pe', '$2a$10$7RIsCQc82Ld0QGdZo4Urk.ZTxw0DJ/Nb.2mG0uBpBJnoYOwAIs1Kq', 'LIDER', 'ACTIVO', 'Teología', '2025-09-14 09:44:22', '2025-09-15 13:24:21', NULL, NULL, 'Grupo B - Teología', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:24:21.689387'),
+(6, 'Juan Pérez', '55667788', 'juan.perez@upeu.edu.pe', '$2a$10$IsrWH6CbpC2RxEpK.oVyaOwhF6hjRmJ2iVokWKDVQvzN22xAaPA2a', 'INTEGRANTE', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-15 13:24:39', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:24:39.427336'),
+(7, 'María García', '66778899', 'maria.garcia@upeu.edu.pe', '$2a$10$iFT.drKaSBj0OFrcK.t8W.MMaeqZjYJgfCF01rBNyVrWYw999Jmza', 'INTEGRANTE', 'ACTIVO', 'Teología', '2025-09-14 09:44:22', '2025-09-15 13:24:50', NULL, NULL, 'Grupo B - Teología', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:24:50.961245'),
+(8, 'Carlos López', '77889900', 'carlos.lopez@upeu.edu.pe', '$2a$10$WRKvftXF9ZmbhlYmftWfNOfah/7t31c1kSsebbIYYGr7pWFIifPy.', 'INTEGRANTE', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-15 13:25:05', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:25:05.223927');
 
 -- --------------------------------------------------------
 
@@ -89,11 +89,11 @@ INSERT INTO `usuario` (`id_usuario`, `nombre_completo`, `dni`, `correo`, `contra
 -- (See below for the actual view)
 --
 CREATE TABLE `vista_usuarios_estadisticas` (
-`activos` decimal(23,0)
+`rol` enum('SUPERADMIN','ADMIN','LIDER','INTEGRANTE')
+,`total` bigint
+,`activos` decimal(23,0)
 ,`bloqueados` decimal(23,0)
 ,`inactivos` decimal(23,0)
-,`rol` enum('SUPERADMIN','ADMIN','LIDER','INTEGRANTE')
-,`total` bigint
 );
 
 --
@@ -136,7 +136,7 @@ ALTER TABLE `auditoria`
 -- AUTO_INCREMENT for table `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 -- --------------------------------------------------------
 

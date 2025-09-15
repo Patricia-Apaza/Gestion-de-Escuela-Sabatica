@@ -65,6 +65,10 @@ public class Usuario {
     @Column(name = "intentos_fallidos")
     private Integer intentosFallidos = 0;
 
+    public Integer getIntentosFallidos() {
+        return intentosFallidos != null ? intentosFallidos : 0;
+    }
+
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 

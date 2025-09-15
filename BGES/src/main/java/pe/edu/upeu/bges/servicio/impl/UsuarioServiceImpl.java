@@ -51,7 +51,17 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public UsuarioDto.LoginResponseDto login(UsuarioDto.LoginRequestDto loginRequest) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByDni(loginRequest.dni());
+        Optional<Usuario> usuarioOpt = Optional.empty();
+
+        // Intentar buscar por correo primero
+        if (loginRequest.usuario().contains("@")) {
+            usuarioOpt = usuarioRepository.findByCorreo(loginRequest.usuario());
+        }
+
+        // Si no se encontró por correo, intentar por DNI
+        if (usuarioOpt.isEmpty()) {
+            usuarioOpt = usuarioRepository.findByDni(loginRequest.usuario());
+        }
 
         if (usuarioOpt.isEmpty()) {
             return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario no encontrado", null);
@@ -59,8 +69,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         Usuario usuario = usuarioOpt.get();
 
+        // Manejar intentos fallidos null - CORREGIDO
+        int intentosFallidos = usuario.getIntentosFallidos() != null ? usuario.getIntentosFallidos() : 0;
+
         // Verificar intentos fallidos (bloqueo automático después de 5 intentos)
-        if (usuario.getIntentosFallidos() >= 5) {
+        if (intentosFallidos >= 5) {
             return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario bloqueado por intentos fallidos", null);
         }
 
@@ -73,7 +86,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         }
 
         if (!passwordEncoder.matches(loginRequest.contraseña(), usuario.getContraseña())) {
-            usuarioRepository.incrementarIntentosFallidos(loginRequest.dni());
+            usuarioRepository.incrementarIntentosFallidos(usuario.getDni());
             return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Contraseña incorrecta", null);
         }
 

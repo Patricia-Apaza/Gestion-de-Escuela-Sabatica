@@ -2,10 +2,14 @@ package pe.edu.upeu.bges.control;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upeu.bges.dtos.UsuarioDto;
 import pe.edu.upeu.bges.modelo.Usuario;
+import pe.edu.upeu.bges.repositorio.UsuarioRepository;
 import pe.edu.upeu.bges.servicio.IUsuarioService;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -14,6 +18,10 @@ public class AuthController {
 
     @Autowired
     private IUsuarioService usuarioService;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<UsuarioDto.LoginResponseDto> login(@RequestBody UsuarioDto.LoginRequestDto loginRequest) {
@@ -51,6 +59,25 @@ public class AuthController {
             return ResponseEntity.ok("Se ha enviado un correo con instrucciones para recuperar la contraseña");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al procesar solicitud: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String dni, @RequestParam String nuevaPassword) {
+        try {
+            // Buscar usuario por DNI
+            Optional<Usuario> usuarioOpt = usuarioRepository.findByDni(dni);
+            if (usuarioOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body("Usuario no encontrado");
+            }
+
+            Usuario usuario = usuarioOpt.get();
+            usuario.setContraseña(passwordEncoder.encode(nuevaPassword));
+            usuarioRepository.save(usuario);
+
+            return ResponseEntity.ok("Contraseña actualizada. Hash: " + usuario.getContraseña());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
 }

@@ -26,7 +26,7 @@ public class UsuarioDto {
     private LocalDateTime accesoTemporalHasta;
 
     // DTOs para diferentes operaciones según los requerimientos
-    public record LoginRequestDto(String dni, String contraseña) {}
+    public record LoginRequestDto(String usuario, String contraseña) {}
 
     public record LoginResponseDto(
             Long idUsuario,

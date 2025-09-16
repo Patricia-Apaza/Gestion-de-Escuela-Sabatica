@@ -38,7 +38,9 @@ public class UsuarioDto {
             String grupoAsignado,
             boolean success,
             String message,
-            String redirectTo // Para saber a qué panel redirigir según el rol
+            String redirectTo, // Para saber a qué panel redirigir según el rol
+            String token,
+            long expiresIn
     ) {}
 
     public record CrearUsuarioDto(

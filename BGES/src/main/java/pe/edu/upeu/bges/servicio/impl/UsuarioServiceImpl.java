@@ -7,6 +7,7 @@ import pe.edu.upeu.bges.dtos.UsuarioDto;
 import pe.edu.upeu.bges.excepciones.ModelNotFoundException;
 import pe.edu.upeu.bges.modelo.Usuario;
 import pe.edu.upeu.bges.repositorio.UsuarioRepository;
+import pe.edu.upeu.bges.security.JwtTokenUtil;
 import pe.edu.upeu.bges.servicio.IUsuarioService;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Override
     public Usuario save(Usuario usuario) {
@@ -64,34 +68,37 @@ public class UsuarioServiceImpl implements IUsuarioService {
         }
 
         if (usuarioOpt.isEmpty()) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario no encontrado", null);
+            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario no encontrado", null, null, 0);
         }
 
         Usuario usuario = usuarioOpt.get();
 
-        // Manejar intentos fallidos null - CORREGIDO
+        // Manejar intentos fallidos null
         int intentosFallidos = usuario.getIntentosFallidos() != null ? usuario.getIntentosFallidos() : 0;
 
         // Verificar intentos fallidos (bloqueo automático después de 5 intentos)
         if (intentosFallidos >= 5) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario bloqueado por intentos fallidos", null);
+            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario bloqueado por intentos fallidos", null, null, 0);
         }
 
         if (usuario.getEstado() == Usuario.Estado.BLOQUEADO && !usuario.tieneAccesoTemporalVigente()) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario bloqueado", null);
+            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario bloqueado", null, null, 0);
         }
 
         if (usuario.getEstado() == Usuario.Estado.INACTIVO && !usuario.tieneAccesoTemporalVigente()) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario inactivo", null);
+            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario inactivo", null, null, 0);
         }
 
         if (!passwordEncoder.matches(loginRequest.contraseña(), usuario.getContraseña())) {
             usuarioRepository.incrementarIntentosFallidos(usuario.getDni());
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Contraseña incorrecta", null);
+            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Contraseña incorrecta", null, null, 0);
         }
 
         // Reset intentos fallidos en login exitoso
         usuarioRepository.resetearIntentosFallidos(usuario.getIdUsuario());
+
+        // GENERAR TOKEN JWT
+        String token = jwtTokenUtil.generateToken(usuario);
 
         // Determinar redirección según el rol
         String redirectTo = switch (usuario.getRol()) {
@@ -111,7 +118,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 usuario.getGrupoAsignado(),
                 true,
                 "Login exitoso",
-                redirectTo
+                redirectTo,
+                token,
+                5 * 60 * 60
         );
     }
 

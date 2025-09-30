@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 21, 2025 at 07:41 AM
+-- Generation Time: Sep 30, 2025 at 09:51 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -158,6 +158,85 @@ CREATE TABLE `eventos` (
   `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `creado_por` bigint DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `eventos_calendario`
+--
+
+CREATE TABLE `eventos_calendario` (
+  `id_evento_local` bigint NOT NULL,
+  `google_event_id` varchar(500) DEFAULT NULL,
+  `titulo` varchar(200) NOT NULL,
+  `descripcion` text,
+  `fecha_inicio` datetime NOT NULL,
+  `fecha_fin` datetime NOT NULL,
+  `ubicacion` varchar(200) DEFAULT NULL,
+  `color` varchar(20) DEFAULT '#1976d2',
+  `estado` enum('PLANIFICADO','EN_CURSO','FINALIZADO','CANCELADO') DEFAULT 'PLANIFICADO',
+  `tipo_evento` enum('RETIRO','CONGRESO','REUNION','CAPACITACION','CULTO','OTRO') NOT NULL,
+  `facultad_carrera` varchar(100) DEFAULT NULL,
+  `visible_para` enum('TODOS','FACULTAD','GRUPO','ADMIN') DEFAULT 'TODOS',
+  `sincronizado_google` tinyint(1) DEFAULT '0',
+  `fecha_sincronizacion` datetime DEFAULT NULL,
+  `recordatorio` tinyint(1) DEFAULT '1',
+  `minutos_antes_recordatorio` int DEFAULT '30',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `creado_por` bigint NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `eventos_calendario`
+--
+
+INSERT INTO `eventos_calendario` (`id_evento_local`, `google_event_id`, `titulo`, `descripcion`, `fecha_inicio`, `fecha_fin`, `ubicacion`, `color`, `estado`, `tipo_evento`, `facultad_carrera`, `visible_para`, `sincronizado_google`, `fecha_sincronizacion`, `recordatorio`, `minutos_antes_recordatorio`, `fecha_creacion`, `creado_por`) VALUES
+(3, 'df42hd5350bbduouchg1s08fv0', 'Retiro Espiritual 2024', 'Retiro anual de grupos pequeños', '2024-12-15 09:00:00', '2024-12-15 18:00:00', 'Campus Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-29 09:36:59', 1, 30, '2025-09-29 14:36:57', 1),
+(4, 'h5akbump0qj2rl737nbaaf55h4', 'Retiro Espiritual 2025', 'Grupos pequeños', '2024-12-15 09:00:00', '2024-12-15 18:00:00', 'Campus Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-29 09:39:36', 1, 30, '2025-09-29 14:39:35', 1),
+(5, 'v7e12gtp7j8ct7t4stqb6jh8rk', 'Retiro Espiritual 2024 - ACTUALIZADO', 'Nueva descripción', '2024-12-15 10:00:00', '2024-12-15 19:00:00', 'Nuevo lugar', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-29 09:41:35', 1, 30, '2025-09-29 14:41:33', 1),
+(6, 'pt1nb4o382h59bjn9m96tt3cq4', 'Espiritual 2025', 'Retiro anual de grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-29 09:51:14', 1, 30, '2025-09-29 14:51:12', 1),
+(7, 'nkalccmltf9rltmuro1girb3c4', 'Confraternidad 2025', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-29 10:06:50', 1, 30, '2025-09-29 15:06:48', 1),
+(8, '3ohcr8g440p7bsoshasffas1p8', 'Con 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:13:32', 1, 30, '2025-09-30 09:13:31', 3),
+(9, 'i4gjf4m6tlvv9qmqfhgsmd4ofo', 'Con Gru 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:14:34', 1, 30, '2025-09-30 09:14:33', 3),
+(10, 'o78clu5kqosj43jc6e11a5pg6o', 'Sábado 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:28:35', 1, 30, '2025-09-30 09:28:34', 2),
+(11, '0a0orbiv007s7mmeh0j96uu8d8', 'Escuela Sabática 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:50:34', 1, 30, '2025-09-30 09:50:33', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `evento_asistentes`
+--
+
+CREATE TABLE `evento_asistentes` (
+  `id_asistente` bigint NOT NULL,
+  `evento_id` bigint NOT NULL,
+  `usuario_id` bigint DEFAULT NULL,
+  `email` varchar(100) NOT NULL,
+  `estado_confirmacion` enum('PENDIENTE','CONFIRMADO','RECHAZADO','TENTATIVO') DEFAULT 'PENDIENTE',
+  `fecha_confirmacion` datetime DEFAULT NULL,
+  `notificado` tinyint(1) DEFAULT '0',
+  `fecha_notificacion` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `evento_asistentes`
+--
+
+INSERT INTO `evento_asistentes` (`id_asistente`, `evento_id`, `usuario_id`, `email`, `estado_confirmacion`, `fecha_confirmacion`, `notificado`, `fecha_notificacion`) VALUES
+(1, 3, NULL, 'estudiante1@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(2, 3, NULL, 'estudiante2@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(3, 4, NULL, 'estudiante1@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(4, 4, NULL, 'estudiante2@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(5, 5, NULL, 'nuevo@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(6, 6, NULL, 'estudiante1@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(7, 6, NULL, 'estudiante2@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(8, 7, NULL, 'estudiante1@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(9, 7, NULL, 'estudiante2@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(10, 8, NULL, 'estudiante1@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(11, 8, NULL, 'estudiante2@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(12, 9, NULL, 'maria.garcia@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(13, 10, NULL, 'maria.garcia@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(14, 11, NULL, 'maria.garcia@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -388,9 +467,9 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre_completo`, `dni`, `correo`, `contraseña`, `rol`, `estado`, `facultad_carrera`, `fecha_creacion`, `fecha_modificacion`, `creado_por`, `modificado_por`, `grupo_asignado`, `acceso_temporal_hasta`, `direccion`, `fecha_nacimiento`, `intentos_fallidos`, `observaciones`, `telefono`, `ultimo_acceso`) VALUES
-(1, 'Super Administrador', '12345678', 'superadmin@upeu.edu.pe', '$2a$10$upO.JBu9vLaXVkAm/guOxOlUTvXEQTAixWPwIj0G9N3Hm7lMtV58O', 'SUPERADMIN', 'ACTIVO', NULL, '2025-09-14 09:37:37', '2025-09-21 06:52:13', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-21 01:52:13.467914'),
-(2, 'Admin Ingeniería', '87654321', 'admin.ing@upeu.edu.pe', '$2a$10$ATKkWlRSao49q5FvRh/qeenAgC9JPJ5mj5X2Yj8OwxkuRDU4cs/Ye', 'ADMIN', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:37:37', '2025-09-16 09:19:42', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-16 04:19:42.927498'),
-(3, 'Admin Teología', '11122233', 'admin.teo@upeu.edu.pe', '$2a$10$A7cmJc2ToK21z..PTX.SDe0n8Sr1GSngcpFeoQrd9BKELjVlxAcwi', 'ADMIN', 'ACTIVO', 'Teología', '2025-09-14 09:37:37', '2025-09-15 13:24:04', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:24:04.131294'),
+(1, 'Super Administrador', '12345678', 'superadmin@upeu.edu.pe', '$2a$10$upO.JBu9vLaXVkAm/guOxOlUTvXEQTAixWPwIj0G9N3Hm7lMtV58O', 'SUPERADMIN', 'ACTIVO', NULL, '2025-09-14 09:37:37', '2025-09-29 14:35:51', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-29 09:35:51.506435'),
+(2, 'Admin Ingeniería', '87654321', 'admin.ing@upeu.edu.pe', '$2a$10$ATKkWlRSao49q5FvRh/qeenAgC9JPJ5mj5X2Yj8OwxkuRDU4cs/Ye', 'ADMIN', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:37:37', '2025-09-30 09:28:03', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-30 04:28:03.501230'),
+(3, 'Admin Teología', '11122233', 'admin.teo@upeu.edu.pe', '$2a$10$A7cmJc2ToK21z..PTX.SDe0n8Sr1GSngcpFeoQrd9BKELjVlxAcwi', 'ADMIN', 'ACTIVO', 'Teología', '2025-09-14 09:37:37', '2025-09-30 09:12:41', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-30 04:12:41.042098'),
 (4, 'Líder Grupo A', '33344455', 'lider.a@upeu.edu.pe', '$2a$10$jjxsR6N8wLhuHKkPihMhNOyiMNZ476WKlHDnL2DqECMsTa82QSGOm', 'LIDER', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-16 09:19:59', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-16 04:19:59.134034'),
 (5, 'Líder Grupo B', '44455566', 'lider.b@upeu.edu.pe', '$2a$10$7RIsCQc82Ld0QGdZo4Urk.ZTxw0DJ/Nb.2mG0uBpBJnoYOwAIs1Kq', 'LIDER', 'ACTIVO', 'Teología', '2025-09-14 09:44:22', '2025-09-15 13:24:21', NULL, NULL, 'Grupo B - Teología', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:24:21.689387'),
 (6, 'Juan Pérez', '55667788', 'juan.perez@upeu.edu.pe', '$2a$10$IsrWH6CbpC2RxEpK.oVyaOwhF6hjRmJ2iVokWKDVQvzN22xAaPA2a', 'INTEGRANTE', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-16 09:20:17', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-16 04:20:17.294997'),
@@ -479,6 +558,26 @@ ALTER TABLE `eventos`
   ADD KEY `idx_estado` (`estado`),
   ADD KEY `idx_facultad` (`facultad_carrera`),
   ADD KEY `creado_por` (`creado_por`);
+
+--
+-- Indexes for table `eventos_calendario`
+--
+ALTER TABLE `eventos_calendario`
+  ADD PRIMARY KEY (`id_evento_local`),
+  ADD UNIQUE KEY `google_event_id` (`google_event_id`),
+  ADD KEY `idx_fecha_inicio` (`fecha_inicio`),
+  ADD KEY `idx_google_id` (`google_event_id`),
+  ADD KEY `idx_facultad` (`facultad_carrera`),
+  ADD KEY `creado_por` (`creado_por`);
+
+--
+-- Indexes for table `evento_asistentes`
+--
+ALTER TABLE `evento_asistentes`
+  ADD PRIMARY KEY (`id_asistente`),
+  ADD UNIQUE KEY `unique_evento_email` (`evento_id`,`email`),
+  ADD KEY `idx_evento` (`evento_id`),
+  ADD KEY `idx_usuario` (`usuario_id`);
 
 --
 -- Indexes for table `grupos`
@@ -594,6 +693,18 @@ ALTER TABLE `eventos`
   MODIFY `id_evento` bigint NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `eventos_calendario`
+--
+ALTER TABLE `eventos_calendario`
+  MODIFY `id_evento_local` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `evento_asistentes`
+--
+ALTER TABLE `evento_asistentes`
+  MODIFY `id_asistente` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `grupos`
 --
 ALTER TABLE `grupos`
@@ -689,6 +800,19 @@ ALTER TABLE `configuracion_sistema`
 --
 ALTER TABLE `eventos`
   ADD CONSTRAINT `eventos_ibfk_1` FOREIGN KEY (`creado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `eventos_calendario`
+--
+ALTER TABLE `eventos_calendario`
+  ADD CONSTRAINT `eventos_calendario_ibfk_1` FOREIGN KEY (`creado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `evento_asistentes`
+--
+ALTER TABLE `evento_asistentes`
+  ADD CONSTRAINT `evento_asistentes_ibfk_1` FOREIGN KEY (`evento_id`) REFERENCES `eventos_calendario` (`id_evento_local`) ON DELETE CASCADE,
+  ADD CONSTRAINT `evento_asistentes_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `grupos`

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 30, 2025 at 09:51 AM
+-- Generation Time: Oct 05, 2025 at 02:20 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -63,20 +63,80 @@ CREATE TABLE `asistencias` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `auditoria`
+-- Table structure for table `catalogo_programas`
 --
 
-CREATE TABLE `auditoria` (
-  `id_auditoria` bigint NOT NULL,
-  `usuario_id` bigint NOT NULL,
-  `accion` varchar(50) NOT NULL,
-  `tabla_afectada` varchar(50) NOT NULL,
-  `registro_id` bigint DEFAULT NULL,
-  `datos_anteriores` json DEFAULT NULL,
-  `datos_nuevos` json DEFAULT NULL,
-  `fecha_accion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `direccion_ip` varchar(45) DEFAULT NULL
+CREATE TABLE `catalogo_programas` (
+  `id_programa` bigint NOT NULL,
+  `sede` varchar(50) NOT NULL,
+  `facultad` varchar(200) NOT NULL,
+  `programa_estudio` varchar(200) NOT NULL,
+  `activo` tinyint(1) DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `catalogo_programas`
+--
+
+INSERT INTO `catalogo_programas` (`id_programa`, `sede`, `facultad`, `programa_estudio`, `activo`) VALUES
+(1, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Comunicación Audiovisual y Medios Interactivos', 1),
+(2, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Comunicación Organizacional', 1),
+(3, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Comunicación y Periodismo', 1),
+(4, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Comunicación y Publicidad', 1),
+(5, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Derecho', 1),
+(6, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Educación Especialidad Ciencias Naturales y Tecnología', 1),
+(7, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Educación Física, Recreación y Deportes', 1),
+(8, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Inglés y Español', 1),
+(9, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Inicial y Puericultura', 1),
+(10, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Educación Especialidad Matemática Análisis de Datos y Computación', 1),
+(11, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Música y Artes Visuales', 1),
+(12, 'FILIAL_LIMA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Primaria y Pedagogía Terapéutica', 1),
+(13, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Arquitectura y Urbanismo', 1),
+(14, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería Ambiental', 1),
+(15, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería Civil', 1),
+(16, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Ciberseguridad', 1),
+(17, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Industrias Alimentarias', 1),
+(18, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 1),
+(19, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Software', 1),
+(20, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería en Ciencia de Datos', 1),
+(21, 'FILIAL_LIMA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería Industrial', 1),
+(22, 'FILIAL_LIMA', 'Facultad de Ciencias de la Salud', 'Enfermería', 1),
+(23, 'FILIAL_LIMA', 'Facultad de Ciencias de la Salud', 'Nutrición Humana', 1),
+(24, 'FILIAL_LIMA', 'Facultad de Ciencias de la Salud', 'Psicología', 1),
+(25, 'FILIAL_LIMA', 'Facultad de Ciencias de la Salud', 'Medicina', 1),
+(26, 'FILIAL_LIMA', 'Facultad de Ciencias de la Salud', 'Tecnología Médica Laboratorio Clínico y Anatomía Patológica', 1),
+(27, 'FILIAL_LIMA', 'Facultad de Ciencias de la Salud', 'Tecnología Médica Terapia Física y Rehabilitación', 1),
+(28, 'FILIAL_LIMA', 'Facultad de Teología', 'Teología', 1),
+(29, 'FILIAL_LIMA', 'Facultad de Ciencias Empresariales', 'Administración', 1),
+(30, 'FILIAL_LIMA', 'Facultad de Ciencias Empresariales', 'Contabilidad, Gestión Tributaria y Aduanera', 1),
+(31, 'FILIAL_LIMA', 'Facultad de Ciencias Empresariales', 'Marketing y Negocios Internacionales', 1),
+(32, 'FILIAL_TARAPOTO', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Primaria y Pedagogía Terapéutica', 1),
+(33, 'FILIAL_TARAPOTO', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Inicial y Puericultura', 1),
+(34, 'FILIAL_TARAPOTO', 'Facultad de Ingeniería y Arquitectura', 'Arquitectura y Urbanismo', 1),
+(35, 'FILIAL_TARAPOTO', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería Ambiental', 1),
+(36, 'FILIAL_TARAPOTO', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería Civil', 1),
+(37, 'FILIAL_TARAPOTO', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 1),
+(38, 'FILIAL_TARAPOTO', 'Facultad de Ciencias de la Salud', 'Enfermería', 1),
+(39, 'FILIAL_TARAPOTO', 'Facultad de Ciencias de la Salud', 'Psicología', 1),
+(40, 'FILIAL_TARAPOTO', 'Facultad de Ciencias Empresariales', 'Administración', 1),
+(41, 'FILIAL_TARAPOTO', 'Facultad de Ciencias Empresariales', 'Contabilidad, Gestión Tributaria y Aduanera', 1),
+(42, 'FILIAL_TARAPOTO', 'Facultad de Ciencias Empresariales', 'Marketing y Negocios Internacionales', 1),
+(43, 'FILIAL_JULIACA', 'Facultad de Ciencias Humanas y Educación', 'Educación Especialidad Ciencias Naturales y Tecnología', 1),
+(44, 'FILIAL_JULIACA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Educación Física, Recreación y Deportes', 1),
+(45, 'FILIAL_JULIACA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Inglés y Español', 1),
+(46, 'FILIAL_JULIACA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Inicial y Puericultura', 1),
+(47, 'FILIAL_JULIACA', 'Facultad de Ciencias Humanas y Educación', 'Educación Especialidad Matemática Análisis de Datos y Computación', 1),
+(48, 'FILIAL_JULIACA', 'Facultad de Ciencias Humanas y Educación', 'Educación, Especialidad Primaria y Pedagogía Terapéutica', 1),
+(49, 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Arquitectura y Urbanismo', 1),
+(50, 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería Ambiental', 1),
+(51, 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería Civil', 1),
+(52, 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Industrias Alimentarias', 1),
+(53, 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 1),
+(54, 'FILIAL_JULIACA', 'Facultad de Ciencias de la Salud', 'Enfermería', 1),
+(55, 'FILIAL_JULIACA', 'Facultad de Ciencias de la Salud', 'Nutrición Humana', 1),
+(56, 'FILIAL_JULIACA', 'Facultad de Ciencias de la Salud', 'Psicología', 1),
+(57, 'FILIAL_JULIACA', 'Facultad de Ciencias Empresariales', 'Administración', 1),
+(58, 'FILIAL_JULIACA', 'Facultad de Ciencias Empresariales', 'Contabilidad, Gestión Tributaria y Aduanera', 1);
 
 -- --------------------------------------------------------
 
@@ -394,6 +454,50 @@ INSERT INTO `menu_roles` (`id_menu_rol`, `menu_id`, `rol`, `puede_ver`, `puede_e
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `personas`
+--
+
+CREATE TABLE `personas` (
+  `id_persona` bigint NOT NULL,
+  `usuario_id` bigint DEFAULT NULL COMMENT 'Relación con tabla usuarios',
+  `codigo_estudiante` varchar(20) NOT NULL COMMENT 'Código único del estudiante',
+  `nombres` varchar(100) NOT NULL,
+  `apellidos` varchar(100) NOT NULL,
+  `nombre_completo` varchar(200) GENERATED ALWAYS AS (concat(`apellidos`,_utf8mb4' ',`nombres`)) STORED,
+  `documento_identidad` varchar(20) NOT NULL COMMENT 'DNI',
+  `correo_personal` varchar(100) DEFAULT NULL,
+  `correo_institucional` varchar(100) DEFAULT NULL,
+  `usuario_login` varchar(50) DEFAULT NULL COMMENT 'Usuario del sistema (andy.ccaza)',
+  `celular` varchar(20) DEFAULT NULL,
+  `pais` varchar(50) DEFAULT 'Perú',
+  `foto_url` varchar(500) DEFAULT NULL,
+  `religion` varchar(100) DEFAULT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
+  `fecha_matricula` datetime DEFAULT NULL,
+  `modo_contrato` enum('REGULAR','IRREGULAR') DEFAULT 'REGULAR',
+  `modalidad_estudio` enum('PRESENCIAL','SEMIPRESENCIAL','VIRTUAL') DEFAULT 'PRESENCIAL',
+  `sede` varchar(50) NOT NULL,
+  `facultad` varchar(200) NOT NULL,
+  `programa_estudio` varchar(200) NOT NULL,
+  `ciclo` int DEFAULT NULL,
+  `grupo` int DEFAULT NULL,
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_modificacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `creado_por` bigint DEFAULT NULL,
+  `modificado_por` bigint DEFAULT NULL
+) ;
+
+--
+-- Dumping data for table `personas`
+--
+
+INSERT INTO `personas` (`id_persona`, `usuario_id`, `codigo_estudiante`, `nombres`, `apellidos`, `documento_identidad`, `correo_personal`, `correo_institucional`, `usuario_login`, `celular`, `pais`, `foto_url`, `religion`, `fecha_nacimiento`, `fecha_matricula`, `modo_contrato`, `modalidad_estudio`, `sede`, `facultad`, `programa_estudio`, `ciclo`, `grupo`, `fecha_creacion`, `fecha_modificacion`, `creado_por`, `modificado_por`) VALUES
+(1, 2, '202411800', 'ANDY LEONEL', 'CCAZA ATAMARI', '12345678', 'juan.lopez@gmail.com', 'juan.lopez@upeu.edu.pe', 'juan.lopez', '987654321', 'Perú', NULL, 'Adventista del Séptimo Día', '2005-05-15', '2024-08-01 10:00:00', 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 1, 1, '2025-10-05 13:36:12', '2025-10-05 14:17:57', 1, 1),
+(2, 3, '202411999', 'MARIA', 'GOMEZ', '62177497', 'maria@gmail.com', 'maria@upeu.edu.pe', 'maria.gomez', '999888777', 'Perú', NULL, NULL, NULL, NULL, 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 2, 1, '2025-10-05 13:37:01', '2025-10-05 13:37:01', 1, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `reportes_programados`
 --
 
@@ -436,45 +540,29 @@ CREATE TABLE `seguimiento_espiritual` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `usuario`
+-- Table structure for table `usuarios`
 --
 
-CREATE TABLE `usuario` (
+CREATE TABLE `usuarios` (
   `id_usuario` bigint NOT NULL,
-  `nombre_completo` varchar(100) NOT NULL,
-  `dni` varchar(20) NOT NULL,
-  `correo` varchar(100) DEFAULT NULL,
-  `contraseña` varchar(255) NOT NULL,
-  `rol` enum('SUPERADMIN','ADMIN','LIDER','INTEGRANTE') NOT NULL,
-  `estado` enum('ACTIVO','BLOQUEADO','INACTIVO') DEFAULT 'ACTIVO',
-  `facultad_carrera` varchar(100) DEFAULT NULL,
+  `usuario` varchar(50) NOT NULL COMMENT 'Usuario para login (ej: andy.ccaza)',
+  `correo` varchar(100) DEFAULT NULL COMMENT 'Correo para login',
+  `contraseña` varchar(255) NOT NULL COMMENT 'Contraseña encriptada',
+  `rol` enum('SUPERADMIN','ADMIN','LIDER','INTEGRANTE') NOT NULL DEFAULT 'INTEGRANTE',
+  `activo` tinyint(1) DEFAULT '1',
   `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_modificacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `creado_por` bigint DEFAULT NULL,
-  `modificado_por` bigint DEFAULT NULL,
-  `grupo_asignado` varchar(100) DEFAULT NULL,
-  `acceso_temporal_hasta` datetime(6) DEFAULT NULL,
-  `direccion` text,
-  `fecha_nacimiento` date DEFAULT NULL,
-  `intentos_fallidos` int DEFAULT NULL,
-  `observaciones` text,
-  `telefono` varchar(20) DEFAULT NULL,
-  `ultimo_acceso` datetime(6) DEFAULT NULL
+  `ultimo_acceso` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `usuario`
+-- Dumping data for table `usuarios`
 --
 
-INSERT INTO `usuario` (`id_usuario`, `nombre_completo`, `dni`, `correo`, `contraseña`, `rol`, `estado`, `facultad_carrera`, `fecha_creacion`, `fecha_modificacion`, `creado_por`, `modificado_por`, `grupo_asignado`, `acceso_temporal_hasta`, `direccion`, `fecha_nacimiento`, `intentos_fallidos`, `observaciones`, `telefono`, `ultimo_acceso`) VALUES
-(1, 'Super Administrador', '12345678', 'superadmin@upeu.edu.pe', '$2a$10$upO.JBu9vLaXVkAm/guOxOlUTvXEQTAixWPwIj0G9N3Hm7lMtV58O', 'SUPERADMIN', 'ACTIVO', NULL, '2025-09-14 09:37:37', '2025-09-29 14:35:51', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-29 09:35:51.506435'),
-(2, 'Admin Ingeniería', '87654321', 'admin.ing@upeu.edu.pe', '$2a$10$ATKkWlRSao49q5FvRh/qeenAgC9JPJ5mj5X2Yj8OwxkuRDU4cs/Ye', 'ADMIN', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:37:37', '2025-09-30 09:28:03', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-30 04:28:03.501230'),
-(3, 'Admin Teología', '11122233', 'admin.teo@upeu.edu.pe', '$2a$10$A7cmJc2ToK21z..PTX.SDe0n8Sr1GSngcpFeoQrd9BKELjVlxAcwi', 'ADMIN', 'ACTIVO', 'Teología', '2025-09-14 09:37:37', '2025-09-30 09:12:41', NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-09-30 04:12:41.042098'),
-(4, 'Líder Grupo A', '33344455', 'lider.a@upeu.edu.pe', '$2a$10$jjxsR6N8wLhuHKkPihMhNOyiMNZ476WKlHDnL2DqECMsTa82QSGOm', 'LIDER', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-16 09:19:59', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-16 04:19:59.134034'),
-(5, 'Líder Grupo B', '44455566', 'lider.b@upeu.edu.pe', '$2a$10$7RIsCQc82Ld0QGdZo4Urk.ZTxw0DJ/Nb.2mG0uBpBJnoYOwAIs1Kq', 'LIDER', 'ACTIVO', 'Teología', '2025-09-14 09:44:22', '2025-09-15 13:24:21', NULL, NULL, 'Grupo B - Teología', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-15 08:24:21.689387'),
-(6, 'Juan Pérez', '55667788', 'juan.perez@upeu.edu.pe', '$2a$10$IsrWH6CbpC2RxEpK.oVyaOwhF6hjRmJ2iVokWKDVQvzN22xAaPA2a', 'INTEGRANTE', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-16 09:20:17', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-16 04:20:17.294997'),
-(7, 'María García', '66778899', 'maria.garcia@upeu.edu.pe', '$2a$10$iFT.drKaSBj0OFrcK.t8W.MMaeqZjYJgfCF01rBNyVrWYw999Jmza', 'INTEGRANTE', 'ACTIVO', 'Teología', '2025-09-14 09:44:22', '2025-09-16 09:20:40', NULL, NULL, 'Grupo B - Teología', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-16 04:20:40.505125'),
-(8, 'Carlos López', '77889900', 'carlos.lopez@upeu.edu.pe', '$2a$10$WRKvftXF9ZmbhlYmftWfNOfah/7t31c1kSsebbIYYGr7pWFIifPy.', 'INTEGRANTE', 'ACTIVO', 'Ingeniería de Sistemas', '2025-09-14 09:44:22', '2025-09-16 09:13:23', NULL, NULL, 'Grupo A - Sistemas', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-16 04:13:23.207233');
+INSERT INTO `usuarios` (`id_usuario`, `usuario`, `correo`, `contraseña`, `rol`, `activo`, `fecha_creacion`, `fecha_modificacion`, `ultimo_acceso`) VALUES
+(1, 'superadmin', 'superadmin@upeu.edu.pe', '$2a$10$Lj0lVO9xMA.Vbl1fZhZVDOpFFu/67IiQ3/KHn77n56wnlAfRmdxsK', 'SUPERADMIN', 1, '2025-10-04 21:53:30', '2025-10-05 13:55:18', '2025-10-05 08:55:18'),
+(2, 'juan.lopez', 'juan.lopez@upeu.edu.pe', '$2a$10$KWLc.w1N3rIshAdLZJChzOEnsnQHfu7nMuInv/nJMKqf6s78rsrxi', 'INTEGRANTE', 1, '2025-10-05 13:36:11', '2025-10-05 13:36:11', NULL),
+(3, 'maria.gomez', 'maria@upeu.edu.pe', '$2a$10$mATBujsD8OD1swc90dAU...2YtSHR9KJydc4qABWrYx1WrZbTHzV6', 'INTEGRANTE', 1, '2025-10-05 13:37:01', '2025-10-05 14:16:35', '2025-10-05 09:16:36');
 
 -- --------------------------------------------------------
 
@@ -483,11 +571,6 @@ INSERT INTO `usuario` (`id_usuario`, `nombre_completo`, `dni`, `correo`, `contra
 -- (See below for the actual view)
 --
 CREATE TABLE `vista_usuarios_estadisticas` (
-`rol` enum('SUPERADMIN','ADMIN','LIDER','INTEGRANTE')
-,`total` bigint
-,`activos` decimal(23,0)
-,`bloqueados` decimal(23,0)
-,`inactivos` decimal(23,0)
 );
 
 --
@@ -518,12 +601,13 @@ ALTER TABLE `asistencias`
   ADD KEY `registrado_por` (`registrado_por`);
 
 --
--- Indexes for table `auditoria`
+-- Indexes for table `catalogo_programas`
 --
-ALTER TABLE `auditoria`
-  ADD PRIMARY KEY (`id_auditoria`),
-  ADD KEY `idx_usuario_fecha` (`usuario_id`,`fecha_accion`),
-  ADD KEY `idx_tabla_fecha` (`tabla_afectada`,`fecha_accion`);
+ALTER TABLE `catalogo_programas`
+  ADD PRIMARY KEY (`id_programa`),
+  ADD UNIQUE KEY `unique_sede_facultad_programa` (`sede`,`facultad`,`programa_estudio`),
+  ADD KEY `idx_sede` (`sede`),
+  ADD KEY `idx_facultad` (`facultad`);
 
 --
 -- Indexes for table `comunicaciones`
@@ -619,6 +703,23 @@ ALTER TABLE `menu_roles`
   ADD KEY `idx_rol` (`rol`);
 
 --
+-- Indexes for table `personas`
+--
+ALTER TABLE `personas`
+  ADD PRIMARY KEY (`id_persona`),
+  ADD UNIQUE KEY `codigo_estudiante` (`codigo_estudiante`),
+  ADD UNIQUE KEY `documento_identidad` (`documento_identidad`),
+  ADD UNIQUE KEY `usuario_id` (`usuario_id`),
+  ADD KEY `idx_codigo` (`codigo_estudiante`),
+  ADD KEY `idx_documento` (`documento_identidad`),
+  ADD KEY `idx_sede_facultad` (`sede`,`facultad`),
+  ADD KEY `idx_programa` (`programa_estudio`),
+  ADD KEY `idx_correo_personal` (`correo_personal`),
+  ADD KEY `idx_correo_institucional` (`correo_institucional`),
+  ADD KEY `creado_por` (`creado_por`),
+  ADD KEY `modificado_por` (`modificado_por`);
+
+--
 -- Indexes for table `reportes_programados`
 --
 ALTER TABLE `reportes_programados`
@@ -639,18 +740,15 @@ ALTER TABLE `seguimiento_espiritual`
   ADD KEY `registrado_por` (`registrado_por`);
 
 --
--- Indexes for table `usuario`
+-- Indexes for table `usuarios`
 --
-ALTER TABLE `usuario`
+ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id_usuario`),
-  ADD UNIQUE KEY `dni` (`dni`),
+  ADD UNIQUE KEY `usuario` (`usuario`),
   ADD UNIQUE KEY `correo` (`correo`),
-  ADD KEY `idx_dni` (`dni`),
-  ADD KEY `idx_rol` (`rol`),
-  ADD KEY `idx_estado` (`estado`),
-  ADD KEY `idx_facultad_carrera` (`facultad_carrera`),
-  ADD KEY `creado_por` (`creado_por`),
-  ADD KEY `modificado_por` (`modificado_por`);
+  ADD KEY `idx_usuario` (`usuario`),
+  ADD KEY `idx_correo` (`correo`),
+  ADD KEY `idx_rol` (`rol`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -669,10 +767,10 @@ ALTER TABLE `asistencias`
   MODIFY `id_asistencia` bigint NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `auditoria`
+-- AUTO_INCREMENT for table `catalogo_programas`
 --
-ALTER TABLE `auditoria`
-  MODIFY `id_auditoria` bigint NOT NULL AUTO_INCREMENT;
+ALTER TABLE `catalogo_programas`
+  MODIFY `id_programa` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `comunicaciones`
@@ -696,7 +794,7 @@ ALTER TABLE `eventos`
 -- AUTO_INCREMENT for table `eventos_calendario`
 --
 ALTER TABLE `eventos_calendario`
-  MODIFY `id_evento_local` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_evento_local` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `evento_asistentes`
@@ -729,6 +827,12 @@ ALTER TABLE `menu_roles`
   MODIFY `id_menu_rol` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
+-- AUTO_INCREMENT for table `personas`
+--
+ALTER TABLE `personas`
+  MODIFY `id_persona` bigint NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `reportes_programados`
 --
 ALTER TABLE `reportes_programados`
@@ -741,10 +845,10 @@ ALTER TABLE `seguimiento_espiritual`
   MODIFY `id_seguimiento` bigint NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `usuario`
+-- AUTO_INCREMENT for table `usuarios`
 --
-ALTER TABLE `usuario`
-  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+ALTER TABLE `usuarios`
+  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 -- --------------------------------------------------------
 
@@ -774,12 +878,6 @@ ALTER TABLE `asistencias`
   ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE,
   ADD CONSTRAINT `asistencias_ibfk_2` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id_grupo`) ON DELETE CASCADE,
   ADD CONSTRAINT `asistencias_ibfk_3` FOREIGN KEY (`registrado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL;
-
---
--- Constraints for table `auditoria`
---
-ALTER TABLE `auditoria`
-  ADD CONSTRAINT `auditoria_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `comunicaciones`
@@ -842,6 +940,14 @@ ALTER TABLE `menu_roles`
   ADD CONSTRAINT `menu_roles_ibfk_1` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id_menu`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `personas`
+--
+ALTER TABLE `personas`
+  ADD CONSTRAINT `personas_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL,
+  ADD CONSTRAINT `personas_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL,
+  ADD CONSTRAINT `personas_ibfk_3` FOREIGN KEY (`modificado_por`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `reportes_programados`
 --
 ALTER TABLE `reportes_programados`
@@ -853,13 +959,6 @@ ALTER TABLE `reportes_programados`
 ALTER TABLE `seguimiento_espiritual`
   ADD CONSTRAINT `seguimiento_espiritual_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE,
   ADD CONSTRAINT `seguimiento_espiritual_ibfk_2` FOREIGN KEY (`registrado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL;
-
---
--- Constraints for table `usuario`
---
-ALTER TABLE `usuario`
-  ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`creado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL,
-  ADD CONSTRAINT `usuario_ibfk_2` FOREIGN KEY (`modificado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -3,9 +3,12 @@ package pe.edu.upeu.bges.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pe.edu.upeu.bges.modelo.Persona;
 import pe.edu.upeu.bges.modelo.Usuario;
+import pe.edu.upeu.bges.repositorio.PersonaRepository;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -21,17 +24,28 @@ public class JwtTokenUtil {
     @Value("${jwt.secret:secretsecretsecretsecretsecretsecretsecretsecret}")
     private String secret;
 
-    // Generar token con información del usuario
+    @Autowired
+    private PersonaRepository personaRepository;
+
+    // Generar token con información del usuario y persona
     public String generateToken(Usuario usuario) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("idUsuario", usuario.getIdUsuario());
-        claims.put("nombreCompleto", usuario.getNombreCompleto());
-        claims.put("dni", usuario.getDni());
+        claims.put("usuario", usuario.getUsuario());
         claims.put("rol", usuario.getRol().name());
-        claims.put("facultadCarrera", usuario.getFacultadCarrera());
-        claims.put("grupoAsignado", usuario.getGrupoAsignado());
 
-        return doGenerateToken(claims, usuario.getCorreo());
+        // Obtener datos de Persona si existe
+        Persona persona = personaRepository.findByUsuarioId(usuario.getIdUsuario()).orElse(null);
+        if (persona != null) {
+            claims.put("nombreCompleto", persona.getApellidos() + " " + persona.getNombres());
+            claims.put("dni", persona.getDocumentoIdentidad());
+            claims.put("facultadCarrera", persona.getFacultad());
+            claims.put("programaEstudio", persona.getProgramaEstudio());
+            claims.put("grupo", persona.getGrupo());
+            claims.put("sede", persona.getSede());
+        }
+
+        return doGenerateToken(claims, usuario.getUsuario());
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
@@ -70,7 +84,11 @@ public class JwtTokenUtil {
 
     public Long getIdUsuarioFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
-        return Long.valueOf(claims.get("idUsuario").toString());
+        Object idUsuario = claims.get("idUsuario");
+        if (idUsuario instanceof Integer) {
+            return ((Integer) idUsuario).longValue();
+        }
+        return Long.valueOf(idUsuario.toString());
     }
 
     public String getRolFromToken(String token) {

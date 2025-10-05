@@ -36,8 +36,7 @@ public class UsuarioController {
 
     @PostMapping("/crear")
     public ResponseEntity<Usuario> crear(@RequestBody UsuarioDto.CrearUsuarioDto crearDto) {
-        // Método corregido que ahora existe en la interfaz
-        Usuario usuario = usuarioService.crearUsuario(crearDto, null);
+        Usuario usuario = usuarioService.crearUsuario(crearDto); // CORREGIDO
         return ResponseEntity.ok(usuario);
     }
 
@@ -73,13 +72,11 @@ public class UsuarioController {
 
     @GetMapping("/listar/rol/{rol}")
     public ResponseEntity<List<Usuario>> listarPorRol(@PathVariable Usuario.Rol rol) {
-        // Método corregido que ahora existe en la interfaz
         return ResponseEntity.ok(usuarioService.findByRol(rol));
     }
 
     @GetMapping("/listar/facultad/{facultad}")
     public ResponseEntity<List<Usuario>> listarPorFacultad(@PathVariable String facultad) {
-        // Método corregido que ahora existe en la interfaz
         return ResponseEntity.ok(usuarioService.findByFacultadCarrera(facultad));
     }
 }

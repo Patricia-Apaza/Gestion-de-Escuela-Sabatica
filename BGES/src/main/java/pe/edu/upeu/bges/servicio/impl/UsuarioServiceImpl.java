@@ -3,14 +3,18 @@ package pe.edu.upeu.bges.servicio.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pe.edu.upeu.bges.dtos.UsuarioDto;
 import pe.edu.upeu.bges.excepciones.ModelNotFoundException;
+import pe.edu.upeu.bges.modelo.Persona;
 import pe.edu.upeu.bges.modelo.Usuario;
+import pe.edu.upeu.bges.repositorio.PersonaRepository;
 import pe.edu.upeu.bges.repositorio.UsuarioRepository;
 import pe.edu.upeu.bges.security.JwtTokenUtil;
 import pe.edu.upeu.bges.servicio.IUsuarioService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,86 +25,73 @@ public class UsuarioServiceImpl implements IUsuarioService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private PersonaRepository personaRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Override
-    public Usuario save(Usuario usuario) {
-        return usuarioRepository.save(usuario);
-    }
-
-    @Override
-    public Usuario update(Usuario usuario) {
-        usuario.setFechaModificacion(LocalDateTime.now());
-        return usuarioRepository.save(usuario);
-    }
-
-    @Override
-    public void delete(Long id) {
-        usuarioRepository.deleteById(id);
-    }
-
-    @Override
-    public Usuario findById(Long id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado con ID: " + id));
-    }
-
-    @Override
-    public List<Usuario> findAll() {
-        return usuarioRepository.findAll();
-    }
-
-    @Override
+    @Transactional
     public UsuarioDto.LoginResponseDto login(UsuarioDto.LoginRequestDto loginRequest) {
         Optional<Usuario> usuarioOpt = Optional.empty();
+        String identificador = loginRequest.usuario();
 
-        // Intentar buscar por correo primero
-        if (loginRequest.usuario().contains("@")) {
-            usuarioOpt = usuarioRepository.findByCorreo(loginRequest.usuario());
+        // 1. Intentar buscar por usuario
+        usuarioOpt = usuarioRepository.findByUsuario(identificador);
+
+        // 2. Si no se encontró, intentar por correo
+        if (usuarioOpt.isEmpty()) {
+            usuarioOpt = usuarioRepository.findByCorreo(identificador);
         }
 
-        // Si no se encontró por correo, intentar por DNI
+        // 3. Si no se encontró, buscar por DNI en Persona
         if (usuarioOpt.isEmpty()) {
-            usuarioOpt = usuarioRepository.findByDni(loginRequest.usuario());
+            Optional<Persona> personaOpt = personaRepository.findByDocumentoIdentidad(identificador);
+            if (personaOpt.isPresent() && personaOpt.get().getUsuarioId() != null) {
+                usuarioOpt = usuarioRepository.findById(personaOpt.get().getUsuarioId());
+            }
         }
 
+        // Validar si existe usuario
         if (usuarioOpt.isEmpty()) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario no encontrado", null, null, 0);
+            return new UsuarioDto.LoginResponseDto(
+                    null, null, null, null, null, null, null, null,
+                    false, "Usuario no encontrado", null, null, 0
+            );
         }
 
         Usuario usuario = usuarioOpt.get();
 
-        // Manejar intentos fallidos null
-        int intentosFallidos = usuario.getIntentosFallidos() != null ? usuario.getIntentosFallidos() : 0;
-
-        // Verificar intentos fallidos (bloqueo automático después de 5 intentos)
-        if (intentosFallidos >= 5) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario bloqueado por intentos fallidos", null, null, 0);
+        // Validar si está activo
+        if (!usuario.getActivo()) {
+            return new UsuarioDto.LoginResponseDto(
+                    null, null, null, null, null, null, null, null,
+                    false, "Usuario inactivo", null, null, 0
+            );
         }
 
-        if (usuario.getEstado() == Usuario.Estado.BLOQUEADO && !usuario.tieneAccesoTemporalVigente()) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario bloqueado", null, null, 0);
-        }
-
-        if (usuario.getEstado() == Usuario.Estado.INACTIVO && !usuario.tieneAccesoTemporalVigente()) {
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Usuario inactivo", null, null, 0);
-        }
-
+        // Validar contraseña
         if (!passwordEncoder.matches(loginRequest.contraseña(), usuario.getContraseña())) {
-            usuarioRepository.incrementarIntentosFallidos(usuario.getDni());
-            return new UsuarioDto.LoginResponseDto(null, null, null, null, null, null, null, false, "Contraseña incorrecta", null, null, 0);
+            return new UsuarioDto.LoginResponseDto(
+                    null, null, null, null, null, null, null, null,
+                    false, "Contraseña incorrecta", null, null, 0
+            );
         }
 
-        // Reset intentos fallidos en login exitoso
-        usuarioRepository.resetearIntentosFallidos(usuario.getIdUsuario());
+        // Obtener datos de Persona si existe
+        Persona persona = personaRepository.findByUsuarioId(usuario.getIdUsuario()).orElse(null);
+        String dni = persona != null ? persona.getDocumentoIdentidad() : null;
+        String facultad = persona != null ? persona.getFacultad() : null;
+        String programaEstudio = persona != null ? persona.getProgramaEstudio() : null;
+        String grupo = persona != null && persona.getGrupo() != null ? "Grupo " + persona.getGrupo() : null;
 
-        // GENERAR TOKEN JWT
+        // Generar token JWT
         String token = jwtTokenUtil.generateToken(usuario);
 
-        // Determinar redirección según el rol
+        // Determinar redirección según rol
         String redirectTo = switch (usuario.getRol()) {
             case SUPERADMIN -> "/superadmin/dashboard";
             case ADMIN -> "/admin/dashboard";
@@ -108,14 +99,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
             case INTEGRANTE -> "/integrante/cronograma";
         };
 
+        // Actualizar último acceso
+        usuarioRepository.actualizarUltimoAcceso(usuario.getIdUsuario(), LocalDateTime.now());
+
         return new UsuarioDto.LoginResponseDto(
                 usuario.getIdUsuario(),
-                usuario.getNombreCompleto(),
-                usuario.getDni(),
+                usuario.getUsuario(),
+                dni,
                 usuario.getCorreo(),
                 usuario.getRol(),
-                usuario.getFacultadCarrera(),
-                usuario.getGrupoAsignado(),
+                facultad,
+                programaEstudio,
+                grupo,
                 true,
                 "Login exitoso",
                 redirectTo,
@@ -125,270 +120,159 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
-    public void actualizarUltimoAcceso(Long idUsuario) {
-        usuarioRepository.actualizarUltimoAcceso(idUsuario, LocalDateTime.now());
-    }
-
-    // Operaciones para SuperAdmin
-    @Override
-    public Usuario crearAdmin(UsuarioDto.CrearAdminDto crearAdminDto, Long creadoPor) {
-        if (existsByDni(crearAdminDto.dni())) {
-            throw new ModelNotFoundException("Ya existe un usuario con el DNI: " + crearAdminDto.dni());
+    public Usuario crearUsuario(UsuarioDto.CrearUsuarioDto crearDto) {
+        if (usuarioRepository.existsByUsuario(crearDto.usuario())) {
+            throw new ModelNotFoundException("El usuario ya existe");
         }
 
-        if (crearAdminDto.correo() != null && existsByCorreo(crearAdminDto.correo())) {
-            throw new ModelNotFoundException("Ya existe un usuario con el correo: " + crearAdminDto.correo());
+        if (crearDto.correo() != null && usuarioRepository.existsByCorreo(crearDto.correo())) {
+            throw new ModelNotFoundException("El correo ya está registrado");
         }
 
-        Usuario admin = new Usuario();
-        admin.setNombreCompleto(crearAdminDto.nombreCompleto());
-        admin.setDni(crearAdminDto.dni());
-        admin.setCorreo(crearAdminDto.correo());
-        admin.setContraseña(passwordEncoder.encode(crearAdminDto.contraseña()));
-        admin.setRol(Usuario.Rol.ADMIN);
-        admin.setFacultadCarrera(crearAdminDto.facultadCarrera());
-        admin.setTelefono(crearAdminDto.telefono());
-        admin.setEstado(Usuario.Estado.ACTIVO);
-        admin.setCreadoPor(creadoPor);
+        Usuario usuario = new Usuario();
+        usuario.setUsuario(crearDto.usuario());
+        usuario.setCorreo(crearDto.correo());
+        usuario.setContraseña(passwordEncoder.encode(crearDto.contraseña()));
+        usuario.setRol(crearDto.rol());
+        usuario.setActivo(true);
 
-        return save(admin);
+        return usuarioRepository.save(usuario);
+    }
+
+    // ==================== MÉTODOS STUB (Para que compile) ====================
+
+    @Override
+    public Usuario findById(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new ModelNotFoundException("Usuario no encontrado"));
     }
 
     @Override
-    public List<Usuario> listarAdmins() {
-        return usuarioRepository.findAllAdmins();
+    public List<Usuario> findAll() {
+        return usuarioRepository.findAll();
     }
 
     @Override
-    public void otorgarAccesoTemporal(UsuarioDto.AccesoTemporalDto accesoDto, Long otorgadoPor) {
-        Usuario usuario = findById(accesoDto.idUsuario());
-        usuarioRepository.otorgarAccesoTemporal(accesoDto.idUsuario(), accesoDto.accesoTemporalHasta());
-
-        usuario.setModificadoPor(otorgadoPor);
-        update(usuario);
+    public void delete(Long id) {
+        usuarioRepository.deleteById(id);
     }
 
     @Override
-    public void revocarAccesoTemporal(Long idUsuario, Long revocadoPor) {
-        usuarioRepository.revocarAccesoTemporal(idUsuario);
-        Usuario usuario = findById(idUsuario);
-        usuario.setModificadoPor(revocadoPor);
-        update(usuario);
+    public Usuario crearAdmin(UsuarioDto.CrearAdminDto crearDto, Long creadoPor) {
+        // TODO: Implementar lógica completa
+        throw new ModelNotFoundException("Método no implementado aún");
     }
 
-    @Override
-    public List<Usuario> listarAccesosTemporales() {
-        return usuarioRepository.findUsuarioConAccesoTemporal(LocalDateTime.now());
-    }
-
-    // Operaciones para Admin
     @Override
     public Usuario crearLider(UsuarioDto.CrearUsuarioDto crearDto, Long creadoPor) {
-        return crearUsuarioPorRol(crearDto, Usuario.Rol.LIDER, creadoPor);
+        // TODO: Implementar
+        throw new ModelNotFoundException("Método no implementado aún");
     }
 
     @Override
     public Usuario crearIntegrante(UsuarioDto.CrearUsuarioDto crearDto, Long creadoPor) {
-        return crearUsuarioPorRol(crearDto, Usuario.Rol.INTEGRANTE, creadoPor);
-    }
-
-    private Usuario crearUsuarioPorRol(UsuarioDto.CrearUsuarioDto crearDto, Usuario.Rol rol, Long creadoPor) {
-        if (existsByDni(crearDto.dni())) {
-            throw new ModelNotFoundException("Ya existe un usuario con el DNI: " + crearDto.dni());
-        }
-
-        if (crearDto.correo() != null && existsByCorreo(crearDto.correo())) {
-            throw new ModelNotFoundException("Ya existe un usuario con el correo: " + crearDto.correo());
-        }
-
-        Usuario usuario = new Usuario();
-        usuario.setNombreCompleto(crearDto.nombreCompleto());
-        usuario.setDni(crearDto.dni());
-        usuario.setCorreo(crearDto.correo());
-        usuario.setContraseña(passwordEncoder.encode(crearDto.contraseña()));
-        usuario.setRol(rol);
-        usuario.setFacultadCarrera(crearDto.facultadCarrera());
-        usuario.setGrupoAsignado(crearDto.grupoAsignado());
-        usuario.setTelefono(crearDto.telefono());
-        usuario.setFechaNacimiento(crearDto.fechaNacimiento());
-        usuario.setDireccion(crearDto.direccion());
-        usuario.setObservaciones(crearDto.observaciones());
-        usuario.setEstado(Usuario.Estado.ACTIVO);
-        usuario.setCreadoPor(creadoPor);
-
-        return save(usuario);
+        // TODO: Implementar
+        throw new ModelNotFoundException("Método no implementado aún");
     }
 
     @Override
-    public List<Usuario> listarPorFacultadCarrera(String facultadCarrera) {
-        return usuarioRepository.findByFacultadCarrera(facultadCarrera);
+    public List<Usuario> listarAdmins() {
+        return new ArrayList<>();
     }
 
     @Override
-    public List<Usuario> listarLideresPorFacultad(String facultadCarrera) {
-        return usuarioRepository.findLideresDisponiblesPorFacultad(facultadCarrera);
+    public List<Usuario> listarLideresPorFacultad(String facultad) {
+        return new ArrayList<>();
     }
 
     @Override
-    public List<Usuario> listarIntegrantesPorFacultad(String facultadCarrera) {
-        return usuarioRepository.findByFacultadCarreraAndRol(facultadCarrera, Usuario.Rol.INTEGRANTE);
+    public List<Usuario> listarIntegrantesPorFacultad(String facultad) {
+        return new ArrayList<>();
     }
 
     @Override
-    public void asignarLiderAGrupo(Long idLider, String grupoAsignado, Long modificadoPor) {
-        Usuario lider = findById(idLider);
+    public List<Usuario> listarPorFacultadCarrera(String facultad) {
+        return new ArrayList<>();
+    }
 
-        if (lider.getRol() != Usuario.Rol.LIDER) {
-            throw new ModelNotFoundException("El usuario no es un líder");
-        }
+    @Override
+    public List<Usuario> listarIntegrantesDeGrupo(String grupo) {
+        return new ArrayList<>();
+    }
 
-        lider.setGrupoAsignado(grupoAsignado);
-        lider.setModificadoPor(modificadoPor);
-        update(lider);
+    @Override
+    public List<Usuario> findByRol(Usuario.Rol rol) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<Usuario> findByFacultadCarrera(String facultad) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void asignarLiderAGrupo(Long idLider, String grupo, Long modificadoPor) {
+        // TODO: Implementar
     }
 
     @Override
     public void removerLiderDeGrupo(Long idLider, Long modificadoPor) {
-        Usuario lider = findById(idLider);
-        lider.setGrupoAsignado(null);
-        lider.setModificadoPor(modificadoPor);
-        update(lider);
-    }
-
-    // Operaciones para Líder
-    @Override
-    public List<Usuario> listarIntegrantesDeGrupo(String grupoAsignado) {
-        return usuarioRepository.findByGrupoAsignado(grupoAsignado);
+        // TODO: Implementar
     }
 
     @Override
-    public Usuario buscarLiderDeGrupo(String grupoAsignado) {
-        return usuarioRepository.findByGrupoAsignadoAndRol(grupoAsignado, Usuario.Rol.LIDER)
-                .orElseThrow(() -> new ModelNotFoundException("No se encontró líder para el grupo: " + grupoAsignado));
-    }
-
-    // Operaciones comunes
-    @Override
-    public Usuario actualizarUsuario(UsuarioDto.ActualizarUsuarioDto actualizarDto, Long modificadoPor) {
-        Usuario usuario = findById(actualizarDto.idUsuario());
-
-        if (!usuario.getDni().equals(actualizarDto.dni()) && existsByDni(actualizarDto.dni())) {
-            throw new ModelNotFoundException("Ya existe otro usuario con el DNI: " + actualizarDto.dni());
-        }
-
-        if (actualizarDto.correo() != null &&
-                !actualizarDto.correo().equals(usuario.getCorreo()) &&
-                existsByCorreo(actualizarDto.correo())) {
-            throw new ModelNotFoundException("Ya existe otro usuario con el correo: " + actualizarDto.correo());
-        }
-
-        usuario.setNombreCompleto(actualizarDto.nombreCompleto());
-        usuario.setDni(actualizarDto.dni());
-        usuario.setCorreo(actualizarDto.correo());
-        usuario.setRol(actualizarDto.rol());
-        usuario.setEstado(actualizarDto.estado());
-        usuario.setFacultadCarrera(actualizarDto.facultadCarrera());
-        usuario.setGrupoAsignado(actualizarDto.grupoAsignado());
-        usuario.setTelefono(actualizarDto.telefono());
-        usuario.setFechaNacimiento(actualizarDto.fechaNacimiento());
-        usuario.setDireccion(actualizarDto.direccion());
-        usuario.setObservaciones(actualizarDto.observaciones());
-        usuario.setModificadoPor(modificadoPor);
-
-        return update(usuario);
+    public Usuario buscarLiderDeGrupo(String grupo) {
+        return null;
     }
 
     @Override
-    public void bloquearUsuario(Long idUsuario, Long modificadoPor) {
-        Usuario usuario = findById(idUsuario);
-        usuario.setEstado(Usuario.Estado.BLOQUEADO);
-        usuario.setModificadoPor(modificadoPor);
-        update(usuario);
+    public Usuario actualizarUsuario(UsuarioDto.ActualizarUsuarioDto dto, Long modificadoPor) {
+        throw new ModelNotFoundException("Método no implementado aún");
     }
 
     @Override
-    public void desbloquearUsuario(Long idUsuario, Long modificadoPor) {
-        Usuario usuario = findById(idUsuario);
-        usuario.setEstado(Usuario.Estado.ACTIVO);
-        usuario.setModificadoPor(modificadoPor);
-        usuarioRepository.resetearIntentosFallidos(idUsuario);
-        update(usuario);
+    public void restablecerContraseña(Long id, String nuevaPassword, Long modificadoPor) {
+        Usuario usuario = findById(id);
+        usuario.setContraseña(passwordEncoder.encode(nuevaPassword));
+        usuarioRepository.save(usuario);
     }
 
     @Override
-    public void restablecerContraseña(Long idUsuario, String nuevaContraseña, Long modificadoPor) {
-        Usuario usuario = findById(idUsuario);
-        usuario.setContraseña(passwordEncoder.encode(nuevaContraseña));
-        usuario.setModificadoPor(modificadoPor);
-        usuarioRepository.resetearIntentosFallidos(idUsuario);
-        update(usuario);
+    public void bloquearUsuario(Long id, Long bloqueadoPor) {
+        Usuario usuario = findById(id);
+        usuario.setActivo(false);
+        usuarioRepository.save(usuario);
     }
 
     @Override
-    public boolean existsByDni(String dni) {
-        return usuarioRepository.existsByDni(dni);
+    public void desbloquearUsuario(Long id, Long desbloqueadoPor) {
+        Usuario usuario = findById(id);
+        usuario.setActivo(true);
+        usuarioRepository.save(usuario);
     }
 
     @Override
-    public boolean existsByCorreo(String correo) {
-        return usuarioRepository.existsByCorreo(correo);
+    public void otorgarAccesoTemporal(UsuarioDto.AccesoTemporalDto dto, Long otorgadoPor) {
+        // TODO: Implementar
     }
 
     @Override
-    public boolean puedeGestionarUsuario(Long idGestor, Long idUsuario) {
-        Usuario gestor = findById(idGestor);
-        Usuario usuario = findById(idUsuario);
+    public void revocarAccesoTemporal(Long usuarioId, Long revocadoPor) {
+        // TODO: Implementar
+    }
 
-        return switch (gestor.getRol()) {
-            case SUPERADMIN -> true;
-            case ADMIN -> usuario.getFacultadCarrera().equals(gestor.getFacultadCarrera());
-            case LIDER -> usuario.getGrupoAsignado() != null && usuario.getGrupoAsignado().equals(gestor.getGrupoAsignado());
-            case INTEGRANTE -> false;
-        };
+    @Override
+    public List<Usuario> listarAccesosTemporales() {
+        return new ArrayList<>();
     }
 
     @Override
     public List<Object[]> getEstadisticasPorRol() {
-        return usuarioRepository.getEstadisticasPorRol();
+        return new ArrayList<>();
     }
 
     @Override
     public List<Object[]> getEstadisticasPorFacultad() {
-        return usuarioRepository.getEstadisticasPorFacultad();
-    }
-
-    @Override
-    public Long contarUsuarioPorRol(Usuario.Rol rol) {
-        return (long) usuarioRepository.findByRolAndEstado(rol, Usuario.Estado.ACTIVO).size();
-    }
-
-    // Agregar estos métodos a la clase UsuarioServiceImpl existente:
-
-    @Override
-    public Usuario crearUsuario(UsuarioDto.CrearUsuarioDto crearUsuarioDto, Long creadoPor) {
-        // Método genérico que determina el rol y delega a los métodos específicos
-        return switch (crearUsuarioDto.rol()) {
-            case ADMIN -> crearAdmin(new UsuarioDto.CrearAdminDto(
-                    crearUsuarioDto.nombreCompleto(),
-                    crearUsuarioDto.dni(),
-                    crearUsuarioDto.correo(),
-                    crearUsuarioDto.contraseña(),
-                    crearUsuarioDto.facultadCarrera(),
-                    crearUsuarioDto.telefono()
-            ), creadoPor);
-            case LIDER -> crearLider(crearUsuarioDto, creadoPor);
-            case INTEGRANTE -> crearIntegrante(crearUsuarioDto, creadoPor);
-            default -> throw new ModelNotFoundException("Rol no válido para creación de usuario");
-        };
-    }
-
-    @Override
-    public List<Usuario>findByRol(Usuario.Rol rol) {
-        return usuarioRepository.findByRol(rol);
-    }
-
-    @Override
-    public List<Usuario>findByFacultadCarrera(String facultadCarrera) {
-        return usuarioRepository.findByFacultadCarrera(facultadCarrera);
+        return new ArrayList<>();
     }
 }

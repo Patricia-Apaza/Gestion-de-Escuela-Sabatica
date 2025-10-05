@@ -5,11 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upeu.bges.dtos.UsuarioDto;
+import pe.edu.upeu.bges.excepciones.ModelNotFoundException;
 import pe.edu.upeu.bges.modelo.Usuario;
 import pe.edu.upeu.bges.repositorio.UsuarioRepository;
 import pe.edu.upeu.bges.servicio.IUsuarioService;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,58 +25,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UsuarioDto.LoginResponseDto> login(@RequestBody UsuarioDto.LoginRequestDto loginRequest) {
         UsuarioDto.LoginResponseDto response = usuarioService.login(loginRequest);
-
-        if (response.success()) {
-            // Actualizar último acceso
-            usuarioService.actualizarUltimoAcceso(response.idUsuario());
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
-        }
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/registrar")
-    public ResponseEntity<String> registrar(@RequestBody UsuarioDto.CrearUsuarioDto crearUsuarioDto) {
-        try {
-            // Solo permitir auto-registro de INTEGRANTE
-            if (crearUsuarioDto.rol() != null && crearUsuarioDto.rol() != Usuario.Rol.INTEGRANTE) {
-                return ResponseEntity.badRequest().body("No se puede auto-registrar con ese rol");
-            }
+    @PostMapping("/change-superadmin-password")
+    public ResponseEntity<String> changeSuperadminPassword(@RequestBody String newPassword) {
+        Usuario superadmin = usuarioRepository.findByUsuario("superadmin")
+                .orElseThrow(() -> new ModelNotFoundException("SuperAdmin no encontrado"));
 
-            usuarioService.crearIntegrante(crearUsuarioDto, null);
-            return ResponseEntity.ok("Usuario registrado exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al registrar usuario: " + e.getMessage());
-        }
-    }
+        superadmin.setContraseña(passwordEncoder.encode(newPassword));
+        usuarioRepository.save(superadmin);
 
-    @PostMapping("/recuperar-password")
-    public ResponseEntity<String> recuperarPassword(@RequestParam String dni) {
-        try {
-            // Aquí implementarías la lógica de recuperación de contraseña
-            // Por ahora, solo un mensaje de confirmación
-            return ResponseEntity.ok("Se ha enviado un correo con instrucciones para recuperar la contraseña");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al procesar solicitud: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String dni, @RequestParam String nuevaPassword) {
-        try {
-            // Buscar usuario por DNI
-            Optional<Usuario> usuarioOpt = usuarioRepository.findByDni(dni);
-            if (usuarioOpt.isEmpty()) {
-                return ResponseEntity.badRequest().body("Usuario no encontrado");
-            }
-
-            Usuario usuario = usuarioOpt.get();
-            usuario.setContraseña(passwordEncoder.encode(nuevaPassword));
-            usuarioRepository.save(usuario);
-
-            return ResponseEntity.ok("Contraseña actualizada. Hash: " + usuario.getContraseña());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
+        return ResponseEntity.ok("Contraseña actualizada exitosamente. Nueva contraseña: " + newPassword);
     }
 }

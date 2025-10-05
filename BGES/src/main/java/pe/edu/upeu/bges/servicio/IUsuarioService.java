@@ -2,60 +2,49 @@ package pe.edu.upeu.bges.servicio;
 
 import pe.edu.upeu.bges.dtos.UsuarioDto;
 import pe.edu.upeu.bges.modelo.Usuario;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IUsuarioService {
+    // Autenticación
+    UsuarioDto.LoginResponseDto login(UsuarioDto.LoginRequestDto loginRequest);
 
-    // Operaciones CRUD básicas
-    Usuario save(Usuario usuario);
-    Usuario update(Usuario usuario);
-    void delete(Long id);
+    // CRUD básico
+    Usuario crearUsuario(UsuarioDto.CrearUsuarioDto crearDto);
     Usuario findById(Long id);
     List<Usuario> findAll();
+    void delete(Long id);
 
-    // Autenticación y gestión de sesión
-    UsuarioDto.LoginResponseDto login(UsuarioDto.LoginRequestDto loginRequest);
-    void actualizarUltimoAcceso(Long idUsuario);
-
-    // MÉTODOS QUE FALTAN - AGREGADOS:
-    Usuario crearUsuario(UsuarioDto.CrearUsuarioDto crearUsuarioDto, Long creadoPor);
-    List<Usuario> findByRol(Usuario.Rol rol);
-    List<Usuario> findByFacultadCarrera(String facultadCarrera);
-
-    // Operaciones específicas para SuperAdmin
-    Usuario crearAdmin(UsuarioDto.CrearAdminDto crearAdminDto, Long creadoPor);
-    List<Usuario> listarAdmins();
-    void otorgarAccesoTemporal(UsuarioDto.AccesoTemporalDto accesoDto, Long otorgadoPor);
-    void revocarAccesoTemporal(Long idUsuario, Long revocadoPor);
-    List<Usuario> listarAccesosTemporales();
-
-    // Operaciones para Admin (gestión dentro de su facultad/carrera)
+    // Gestión por roles
+    Usuario crearAdmin(UsuarioDto.CrearAdminDto crearDto, Long creadoPor);
     Usuario crearLider(UsuarioDto.CrearUsuarioDto crearDto, Long creadoPor);
     Usuario crearIntegrante(UsuarioDto.CrearUsuarioDto crearDto, Long creadoPor);
-    List<Usuario> listarPorFacultadCarrera(String facultadCarrera);
-    List<Usuario> listarLideresPorFacultad(String facultadCarrera);
-    List<Usuario> listarIntegrantesPorFacultad(String facultadCarrera);
-    void asignarLiderAGrupo(Long idLider, String grupoAsignado, Long modificadoPor);
+
+    // Listados
+    List<Usuario> listarAdmins();
+    List<Usuario> listarLideresPorFacultad(String facultad);
+    List<Usuario> listarIntegrantesPorFacultad(String facultad);
+    List<Usuario> listarPorFacultadCarrera(String facultad);
+    List<Usuario> listarIntegrantesDeGrupo(String grupo);
+    List<Usuario> findByRol(Usuario.Rol rol);
+    List<Usuario> findByFacultadCarrera(String facultad);
+
+    // Gestión de grupos
+    void asignarLiderAGrupo(Long idLider, String grupo, Long modificadoPor);
     void removerLiderDeGrupo(Long idLider, Long modificadoPor);
+    Usuario buscarLiderDeGrupo(String grupo);
 
-    // Operaciones para Líder (gestión de su grupo)
-    List<Usuario> listarIntegrantesDeGrupo(String grupoAsignado);
-    Usuario buscarLiderDeGrupo(String grupoAsignado);
+    // Actualización y gestión
+    Usuario actualizarUsuario(UsuarioDto.ActualizarUsuarioDto dto, Long modificadoPor);
+    void restablecerContraseña(Long id, String nuevaPassword, Long modificadoPor);
+    void bloquearUsuario(Long id, Long bloqueadoPor);
+    void desbloquearUsuario(Long id, Long desbloqueadoPor);
 
-    // Operaciones comunes de gestión de usuarios
-    Usuario actualizarUsuario(UsuarioDto.ActualizarUsuarioDto actualizarDto, Long modificadoPor);
-    void bloquearUsuario(Long idUsuario, Long modificadoPor);
-    void desbloquearUsuario(Long idUsuario, Long modificadoPor);
-    void restablecerContraseña(Long idUsuario, String nuevaContraseña, Long modificadoPor);
+    // Accesos temporales
+    void otorgarAccesoTemporal(UsuarioDto.AccesoTemporalDto dto, Long otorgadoPor);
+    void revocarAccesoTemporal(Long usuarioId, Long revocadoPor);
+    List<Usuario> listarAccesosTemporales();
 
-    // Consultas de validación
-    boolean existsByDni(String dni);
-    boolean existsByCorreo(String correo);
-    boolean puedeGestionarUsuario(Long idGestor, Long idUsuario);
-
-    // Estadísticas y métricas
+    // Estadísticas
     List<Object[]> getEstadisticasPorRol();
     List<Object[]> getEstadisticasPorFacultad();
-    Long contarUsuarioPorRol(Usuario.Rol rol); // CORREGIDO: era "contarUsuarioPorRol"
 }

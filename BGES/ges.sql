@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 05, 2025 at 02:20 PM
+-- Generation Time: Oct 06, 2025 at 01:50 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -259,7 +259,8 @@ INSERT INTO `eventos_calendario` (`id_evento_local`, `google_event_id`, `titulo`
 (8, '3ohcr8g440p7bsoshasffas1p8', 'Con 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:13:32', 1, 30, '2025-09-30 09:13:31', 3),
 (9, 'i4gjf4m6tlvv9qmqfhgsmd4ofo', 'Con Gru 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:14:34', 1, 30, '2025-09-30 09:14:33', 3),
 (10, 'o78clu5kqosj43jc6e11a5pg6o', 'Sábado 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:28:35', 1, 30, '2025-09-30 09:28:34', 2),
-(11, '0a0orbiv007s7mmeh0j96uu8d8', 'Escuela Sabática 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:50:34', 1, 30, '2025-09-30 09:50:33', 2);
+(11, '0a0orbiv007s7mmeh0j96uu8d8', 'Escuela Sabática 2026', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-09-30 04:50:34', 1, 30, '2025-09-30 09:50:33', 2),
+(14, 'pg4tk2pet5b4nr16ubcajn1roo', 'Sábado con tu facultad', 'Confraternidad grupos pequeños', '2025-12-15 09:00:00', '2025-12-15 18:00:00', 'Universidad', '#1976d2', 'PLANIFICADO', 'OTRO', NULL, 'TODOS', 1, '2025-10-06 08:01:56', 1, 30, '2025-10-06 13:01:52', 1);
 
 -- --------------------------------------------------------
 
@@ -296,7 +297,8 @@ INSERT INTO `evento_asistentes` (`id_asistente`, `evento_id`, `usuario_id`, `ema
 (11, 8, NULL, 'estudiante2@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
 (12, 9, NULL, 'maria.garcia@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
 (13, 10, NULL, 'maria.garcia@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
-(14, 11, NULL, 'maria.garcia@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL);
+(14, 11, NULL, 'maria.garcia@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL),
+(15, 14, NULL, 'maria@upeu.edu.pe', 'PENDIENTE', NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -492,7 +494,7 @@ CREATE TABLE `personas` (
 --
 
 INSERT INTO `personas` (`id_persona`, `usuario_id`, `codigo_estudiante`, `nombres`, `apellidos`, `documento_identidad`, `correo_personal`, `correo_institucional`, `usuario_login`, `celular`, `pais`, `foto_url`, `religion`, `fecha_nacimiento`, `fecha_matricula`, `modo_contrato`, `modalidad_estudio`, `sede`, `facultad`, `programa_estudio`, `ciclo`, `grupo`, `fecha_creacion`, `fecha_modificacion`, `creado_por`, `modificado_por`) VALUES
-(1, 2, '202411800', 'ANDY LEONEL', 'CCAZA ATAMARI', '12345678', 'juan.lopez@gmail.com', 'juan.lopez@upeu.edu.pe', 'juan.lopez', '987654321', 'Perú', NULL, 'Adventista del Séptimo Día', '2005-05-15', '2024-08-01 10:00:00', 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 1, 1, '2025-10-05 13:36:12', '2025-10-05 14:17:57', 1, 1),
+(1, 2, '202411800', 'LEONEL', 'CCAZA ATAMARI', '12345678', 'juan.lopez@gmail.com', 'juan.lopez@upeu.edu.pe', 'juan.lopez', '987654321', 'Perú', NULL, 'Adventista del Séptimo Día', '2005-05-15', '2024-08-01 10:00:00', 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 1, 1, '2025-10-05 13:36:12', '2025-10-06 12:39:08', 1, 1),
 (2, 3, '202411999', 'MARIA', 'GOMEZ', '62177497', 'maria@gmail.com', 'maria@upeu.edu.pe', 'maria.gomez', '999888777', 'Perú', NULL, NULL, NULL, NULL, 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 2, 1, '2025-10-05 13:37:01', '2025-10-05 13:37:01', 1, NULL);
 
 -- --------------------------------------------------------
@@ -560,8 +562,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `correo`, `contraseña`, `rol`, `activo`, `fecha_creacion`, `fecha_modificacion`, `ultimo_acceso`) VALUES
-(1, 'superadmin', 'superadmin@upeu.edu.pe', '$2a$10$Lj0lVO9xMA.Vbl1fZhZVDOpFFu/67IiQ3/KHn77n56wnlAfRmdxsK', 'SUPERADMIN', 1, '2025-10-04 21:53:30', '2025-10-05 13:55:18', '2025-10-05 08:55:18'),
-(2, 'juan.lopez', 'juan.lopez@upeu.edu.pe', '$2a$10$KWLc.w1N3rIshAdLZJChzOEnsnQHfu7nMuInv/nJMKqf6s78rsrxi', 'INTEGRANTE', 1, '2025-10-05 13:36:11', '2025-10-05 13:36:11', NULL),
+(1, 'superadmin', 'superadmin@upeu.edu.pe', '$2a$10$Lj0lVO9xMA.Vbl1fZhZVDOpFFu/67IiQ3/KHn77n56wnlAfRmdxsK', 'SUPERADMIN', 1, '2025-10-04 21:53:30', '2025-10-06 12:38:50', '2025-10-06 07:38:50'),
+(2, 'juan.lopez', 'juan.lopez@upeu.edu.pe', '$2a$10$KWLc.w1N3rIshAdLZJChzOEnsnQHfu7nMuInv/nJMKqf6s78rsrxi', 'INTEGRANTE', 1, '2025-10-05 13:36:11', '2025-10-06 12:36:58', '2025-10-06 07:36:59'),
 (3, 'maria.gomez', 'maria@upeu.edu.pe', '$2a$10$mATBujsD8OD1swc90dAU...2YtSHR9KJydc4qABWrYx1WrZbTHzV6', 'INTEGRANTE', 1, '2025-10-05 13:37:01', '2025-10-05 14:16:35', '2025-10-05 09:16:36');
 
 -- --------------------------------------------------------
@@ -652,7 +654,7 @@ ALTER TABLE `eventos_calendario`
   ADD KEY `idx_fecha_inicio` (`fecha_inicio`),
   ADD KEY `idx_google_id` (`google_event_id`),
   ADD KEY `idx_facultad` (`facultad_carrera`),
-  ADD KEY `creado_por` (`creado_por`);
+  ADD KEY `fk_eventos_calendario_usuarios` (`creado_por`);
 
 --
 -- Indexes for table `evento_asistentes`
@@ -794,13 +796,13 @@ ALTER TABLE `eventos`
 -- AUTO_INCREMENT for table `eventos_calendario`
 --
 ALTER TABLE `eventos_calendario`
-  MODIFY `id_evento_local` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_evento_local` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `evento_asistentes`
 --
 ALTER TABLE `evento_asistentes`
-  MODIFY `id_asistente` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_asistente` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `grupos`
@@ -848,7 +850,7 @@ ALTER TABLE `seguimiento_espiritual`
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 -- --------------------------------------------------------
 
@@ -903,7 +905,7 @@ ALTER TABLE `eventos`
 -- Constraints for table `eventos_calendario`
 --
 ALTER TABLE `eventos_calendario`
-  ADD CONSTRAINT `eventos_calendario_ibfk_1` FOREIGN KEY (`creado_por`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_eventos_calendario_usuarios` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `evento_asistentes`

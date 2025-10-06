@@ -109,18 +109,46 @@ public class PersonaServiceImpl implements IPersonaService {
     public PersonaDto.ResultadoImportacionDto importarDesdeExcel(MultipartFile file, Long creadoPor) {
         List<PersonaDto.ErrorImportacionDto> errores = new ArrayList<>();
         int exitosos = 0;
-        int fila = 2; // Empezar desde fila 2 (después del header)
+        int fila = 2;
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
 
             for (Row row : sheet) {
-                if (row.getRowNum() == 0) continue; // Saltar header
+                if (row.getRowNum() == 0) continue;
 
                 try {
                     PersonaDto.ImportarPersonaDto importDto = extraerDatosDeRow(row);
 
-                    // Validaciones
+                    // Validar campos obligatorios
+                    if (importDto.codigoEstudiante() == null || importDto.codigoEstudiante().isEmpty()) {
+                        errores.add(new PersonaDto.ErrorImportacionDto(
+                                fila, "N/A", "Código de estudiante es obligatorio"
+                        ));
+                        fila++;
+                        continue;
+                    }
+
+                    if (importDto.documentoIdentidad() == null || importDto.documentoIdentidad().isEmpty()) {
+                        errores.add(new PersonaDto.ErrorImportacionDto(
+                                fila, importDto.codigoEstudiante(), "DNI es obligatorio"
+                        ));
+                        fila++;
+                        continue;
+                    }
+
+                    // Validar que al menos un correo esté presente
+                    if ((importDto.correoPersonal() == null || importDto.correoPersonal().isEmpty()) &&
+                            (importDto.correoInstitucional() == null || importDto.correoInstitucional().isEmpty())) {
+                        errores.add(new PersonaDto.ErrorImportacionDto(
+                                fila, importDto.codigoEstudiante(),
+                                "Debe proporcionar al menos un correo"
+                        ));
+                        fila++;
+                        continue;
+                    }
+
+                    // Validaciones de duplicados
                     if (personaRepository.existsByCodigoEstudiante(importDto.codigoEstudiante())) {
                         errores.add(new PersonaDto.ErrorImportacionDto(
                                 fila, importDto.codigoEstudiante(),
@@ -130,7 +158,16 @@ public class PersonaServiceImpl implements IPersonaService {
                         continue;
                     }
 
-                    if (importDto.correoPersonal() != null &&
+                    if (personaRepository.existsByDocumentoIdentidad(importDto.documentoIdentidad())) {
+                        errores.add(new PersonaDto.ErrorImportacionDto(
+                                fila, importDto.codigoEstudiante(),
+                                "DNI duplicado: " + importDto.documentoIdentidad()
+                        ));
+                        fila++;
+                        continue;
+                    }
+
+                    if (importDto.correoPersonal() != null && !importDto.correoPersonal().isEmpty() &&
                             personaRepository.existsByCorreoPersonal(importDto.correoPersonal())) {
                         errores.add(new PersonaDto.ErrorImportacionDto(
                                 fila, importDto.codigoEstudiante(),
@@ -140,11 +177,22 @@ public class PersonaServiceImpl implements IPersonaService {
                         continue;
                     }
 
-                    if (importDto.correoInstitucional() != null &&
+                    if (importDto.correoInstitucional() != null && !importDto.correoInstitucional().isEmpty() &&
                             personaRepository.existsByCorreoInstitucional(importDto.correoInstitucional())) {
                         errores.add(new PersonaDto.ErrorImportacionDto(
                                 fila, importDto.codigoEstudiante(),
                                 "Correo institucional duplicado: " + importDto.correoInstitucional()
+                        ));
+                        fila++;
+                        continue;
+                    }
+
+                    // Validar usuario duplicado
+                    if (importDto.usuarioLogin() != null &&
+                            usuarioRepository.existsByUsuario(importDto.usuarioLogin())) {
+                        errores.add(new PersonaDto.ErrorImportacionDto(
+                                fila, importDto.codigoEstudiante(),
+                                "Usuario duplicado: " + importDto.usuarioLogin()
                         ));
                         fila++;
                         continue;
@@ -248,13 +296,23 @@ public class PersonaServiceImpl implements IPersonaService {
         // Separar nombres y apellidos
         String[] partesNombre = importDto.separarNombresApellidos();
 
+        // Determinar correo para usuario
+        String correoUsuario = importDto.correoInstitucional() != null && !importDto.correoInstitucional().isEmpty()
+                ? importDto.correoInstitucional()
+                : importDto.correoPersonal();
+
+        // Determinar usuario login
+        String usuarioLogin = importDto.usuarioLogin() != null && !importDto.usuarioLogin().isEmpty()
+                ? importDto.usuarioLogin()
+                : importDto.documentoIdentidad(); // Usar DNI si no hay usuario
+
         // Crear usuario
         Usuario usuario = new Usuario();
-        usuario.setUsuario(importDto.usuarioLogin());
-        usuario.setCorreo(importDto.correoInstitucional() != null ?
-                importDto.correoInstitucional() : importDto.correoPersonal());
+        usuario.setUsuario(usuarioLogin);
+        usuario.setCorreo(correoUsuario);
         usuario.setContraseña(passwordEncoder.encode(importDto.codigoEstudiante()));
         usuario.setRol(Usuario.Rol.INTEGRANTE);
+        usuario.setActivo(true);
         usuario = usuarioRepository.save(usuario);
 
         // Crear persona
@@ -266,20 +324,33 @@ public class PersonaServiceImpl implements IPersonaService {
         persona.setDocumentoIdentidad(importDto.documentoIdentidad());
         persona.setCorreoPersonal(importDto.correoPersonal());
         persona.setCorreoInstitucional(importDto.correoInstitucional());
-        persona.setUsuarioLogin(importDto.usuarioLogin());
+        persona.setUsuarioLogin(usuarioLogin);
         persona.setCelular(importDto.celular());
-        persona.setPais(importDto.pais());
+        persona.setPais(importDto.pais() != null ? importDto.pais() : "Perú");
         persona.setFotoUrl(importDto.fotoUrl());
         persona.setReligion(importDto.religion());
         persona.setFechaNacimiento(importDto.fechaNacimiento());
         persona.setFechaMatricula(importDto.fechaMatricula());
 
-        // Convertir strings a enums
-        if (importDto.modoContrato() != null) {
-            persona.setModoContrato(Persona.ModoContrato.valueOf(importDto.modoContrato().toUpperCase()));
+        // Convertir strings a enums con validación
+        if (importDto.modoContrato() != null && !importDto.modoContrato().isEmpty()) {
+            try {
+                persona.setModoContrato(Persona.ModoContrato.valueOf(importDto.modoContrato().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                persona.setModoContrato(Persona.ModoContrato.REGULAR);
+            }
+        } else {
+            persona.setModoContrato(Persona.ModoContrato.REGULAR);
         }
-        if (importDto.modalidadEstudio() != null) {
-            persona.setModalidadEstudio(Persona.ModalidadEstudio.valueOf(importDto.modalidadEstudio().toUpperCase()));
+
+        if (importDto.modalidadEstudio() != null && !importDto.modalidadEstudio().isEmpty()) {
+            try {
+                persona.setModalidadEstudio(Persona.ModalidadEstudio.valueOf(importDto.modalidadEstudio().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                persona.setModalidadEstudio(Persona.ModalidadEstudio.PRESENCIAL);
+            }
+        } else {
+            persona.setModalidadEstudio(Persona.ModalidadEstudio.PRESENCIAL);
         }
 
         persona.setSede(importDto.sede());
@@ -376,17 +447,43 @@ public class PersonaServiceImpl implements IPersonaService {
         );
     }
 
-    // Implementar métodos restantes...
     @Override
     public Persona actualizarPersona(Long idPersona, PersonaDto.CrearPersonaDto actualizarDto, Long modificadoPor) {
         Persona persona = personaRepository.findById(idPersona)
                 .orElseThrow(() -> new ModelNotFoundException("Persona no encontrada"));
 
-        // Actualizar campos
+        // Actualizar TODOS los campos
+        persona.setCodigoEstudiante(actualizarDto.codigoEstudiante());
         persona.setNombres(actualizarDto.nombres());
         persona.setApellidos(actualizarDto.apellidos());
-        // ... actualizar todos los campos necesarios
+        persona.setDocumentoIdentidad(actualizarDto.documentoIdentidad());
+        persona.setCorreoPersonal(actualizarDto.correoPersonal());
+        persona.setCorreoInstitucional(actualizarDto.correoInstitucional());
+        persona.setUsuarioLogin(actualizarDto.usuarioLogin());
+        persona.setCelular(actualizarDto.celular());
+        persona.setPais(actualizarDto.pais());
+        persona.setFotoUrl(actualizarDto.fotoUrl());
+        persona.setReligion(actualizarDto.religion());
+        persona.setFechaNacimiento(actualizarDto.fechaNacimiento());
+        persona.setFechaMatricula(actualizarDto.fechaMatricula());
+        persona.setModoContrato(actualizarDto.modoContrato());
+        persona.setModalidadEstudio(actualizarDto.modalidadEstudio());
+        persona.setSede(actualizarDto.sede());
+        persona.setFacultad(actualizarDto.facultad());
+        persona.setProgramaEstudio(actualizarDto.programaEstudio());
+        persona.setCiclo(actualizarDto.ciclo());
+        persona.setGrupo(actualizarDto.grupo());
         persona.setModificadoPor(modificadoPor);
+
+        if (persona.getUsuarioId() != null) {
+            Usuario usuario = usuarioRepository.findById(persona.getUsuarioId()).orElse(null);
+            if (usuario != null) {
+                usuario.setUsuario(actualizarDto.usuarioLogin());
+                usuario.setCorreo(actualizarDto.correoInstitucional() != null ?
+                        actualizarDto.correoInstitucional() : actualizarDto.correoPersonal());
+                usuarioRepository.save(usuario);
+            }
+        }
 
         return personaRepository.save(persona);
     }

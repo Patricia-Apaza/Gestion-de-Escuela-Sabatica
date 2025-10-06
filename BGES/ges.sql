@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 06, 2025 at 01:50 PM
+-- Generation Time: Oct 06, 2025 at 04:04 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -494,7 +494,7 @@ CREATE TABLE `personas` (
 --
 
 INSERT INTO `personas` (`id_persona`, `usuario_id`, `codigo_estudiante`, `nombres`, `apellidos`, `documento_identidad`, `correo_personal`, `correo_institucional`, `usuario_login`, `celular`, `pais`, `foto_url`, `religion`, `fecha_nacimiento`, `fecha_matricula`, `modo_contrato`, `modalidad_estudio`, `sede`, `facultad`, `programa_estudio`, `ciclo`, `grupo`, `fecha_creacion`, `fecha_modificacion`, `creado_por`, `modificado_por`) VALUES
-(1, 2, '202411800', 'LEONEL', 'CCAZA ATAMARI', '12345678', 'juan.lopez@gmail.com', 'juan.lopez@upeu.edu.pe', 'juan.lopez', '987654321', 'Perú', NULL, 'Adventista del Séptimo Día', '2005-05-15', '2024-08-01 10:00:00', 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 1, 1, '2025-10-05 13:36:12', '2025-10-06 12:39:08', 1, 1),
+(1, 2, '202411755', 'ANDY', 'ATAMARI CCAZA', '09876543', 'andy.nuevo@gmail.com', '62177497@upeu.edu.pe', 'andy.atamari', '946903345', 'Perú', NULL, 'Adventista del Séptimo Día', '2006-11-16', '2025-07-15 14:46:00', 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 2, 1, '2025-10-05 13:36:12', '2025-10-06 15:45:27', 1, 1),
 (2, 3, '202411999', 'MARIA', 'GOMEZ', '62177497', 'maria@gmail.com', 'maria@upeu.edu.pe', 'maria.gomez', '999888777', 'Perú', NULL, NULL, NULL, NULL, 'REGULAR', 'PRESENCIAL', 'FILIAL_JULIACA', 'Facultad de Ingeniería y Arquitectura', 'Ingeniería de Sistemas', 2, 1, '2025-10-05 13:37:01', '2025-10-05 13:37:01', 1, NULL);
 
 -- --------------------------------------------------------
@@ -562,9 +562,9 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `correo`, `contraseña`, `rol`, `activo`, `fecha_creacion`, `fecha_modificacion`, `ultimo_acceso`) VALUES
-(1, 'superadmin', 'superadmin@upeu.edu.pe', '$2a$10$Lj0lVO9xMA.Vbl1fZhZVDOpFFu/67IiQ3/KHn77n56wnlAfRmdxsK', 'SUPERADMIN', 1, '2025-10-04 21:53:30', '2025-10-06 12:38:50', '2025-10-06 07:38:50'),
-(2, 'juan.lopez', 'juan.lopez@upeu.edu.pe', '$2a$10$KWLc.w1N3rIshAdLZJChzOEnsnQHfu7nMuInv/nJMKqf6s78rsrxi', 'INTEGRANTE', 1, '2025-10-05 13:36:11', '2025-10-06 12:36:58', '2025-10-06 07:36:59'),
-(3, 'maria.gomez', 'maria@upeu.edu.pe', '$2a$10$mATBujsD8OD1swc90dAU...2YtSHR9KJydc4qABWrYx1WrZbTHzV6', 'INTEGRANTE', 1, '2025-10-05 13:37:01', '2025-10-05 14:16:35', '2025-10-05 09:16:36');
+(1, 'superadmin', 'superadmin@upeu.edu.pe', '$2a$10$Lj0lVO9xMA.Vbl1fZhZVDOpFFu/67IiQ3/KHn77n56wnlAfRmdxsK', 'SUPERADMIN', 1, '2025-10-04 21:53:30', '2025-10-06 16:00:00', '2025-10-06 11:00:00'),
+(2, 'andy.atamari', '62177497@upeu.edu.pe', '$2a$10$KWLc.w1N3rIshAdLZJChzOEnsnQHfu7nMuInv/nJMKqf6s78rsrxi', 'INTEGRANTE', 1, '2025-10-05 13:36:11', '2025-10-06 15:45:27', '2025-10-06 07:36:59'),
+(3, 'maria.gomez', 'maria@upeu.edu.pe', '$2a$10$mATBujsD8OD1swc90dAU...2YtSHR9KJydc4qABWrYx1WrZbTHzV6', 'INTEGRANTE', 1, '2025-10-05 13:37:01', '2025-10-06 15:31:40', '2025-10-06 10:31:41');
 
 -- --------------------------------------------------------
 
@@ -850,7 +850,7 @@ ALTER TABLE `seguimiento_espiritual`
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_usuario` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 -- --------------------------------------------------------
 

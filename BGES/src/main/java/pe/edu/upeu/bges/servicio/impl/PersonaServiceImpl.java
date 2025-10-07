@@ -105,7 +105,6 @@ public class PersonaServiceImpl implements IPersonaService {
     }
 
     @Override
-    @Transactional
     public PersonaDto.ResultadoImportacionDto importarDesdeExcel(MultipartFile file, Long creadoPor) {
         List<PersonaDto.ErrorImportacionDto> errores = new ArrayList<>();
         int exitosos = 0;
@@ -188,18 +187,21 @@ public class PersonaServiceImpl implements IPersonaService {
                     }
 
                     // Validar usuario duplicado
-                    if (importDto.usuarioLogin() != null &&
-                            usuarioRepository.existsByUsuario(importDto.usuarioLogin())) {
+                    String usuarioLogin = importDto.usuarioLogin() != null && !importDto.usuarioLogin().isEmpty()
+                            ? importDto.usuarioLogin()
+                            : importDto.documentoIdentidad();
+
+                    if (usuarioRepository.existsByUsuario(usuarioLogin)) {
                         errores.add(new PersonaDto.ErrorImportacionDto(
                                 fila, importDto.codigoEstudiante(),
-                                "Usuario duplicado: " + importDto.usuarioLogin()
+                                "Usuario duplicado: " + usuarioLogin
                         ));
                         fila++;
                         continue;
                     }
 
-                    // Crear registro
-                    crearPersonaDesdeImportacion(importDto, creadoPor);
+                    // Crear registro EN TRANSACCIÓN SEPARADA
+                    crearPersonaDesdeImportacionConTransaccion(importDto, creadoPor);
                     exitosos++;
 
                 } catch (Exception e) {
@@ -221,27 +223,32 @@ public class PersonaServiceImpl implements IPersonaService {
         );
     }
 
+    @Transactional
+    private void crearPersonaDesdeImportacionConTransaccion(PersonaDto.ImportarPersonaDto importDto, Long creadoPor) {
+        crearPersonaDesdeImportacion(importDto, creadoPor);
+    }
+
     private PersonaDto.ImportarPersonaDto extraerDatosDeRow(Row row) {
         return new PersonaDto.ImportarPersonaDto(
-                getCellValue(row, 0),  // Código estudiante
-                getCellValue(row, 1),  // Estudiante
-                getCellValue(row, 2),  // Documento
-                getCellValue(row, 3),  // Correo personal
-                getCellValue(row, 4),  // Correo institucional
-                getCellValue(row, 5),  // Usuario
-                getCellValue(row, 6),  // Celular
-                getCellValue(row, 7),  // País
-                getCellValue(row, 8),  // Foto
-                getCellValue(row, 9),  // Religión
-                getCellDate(row, 10),  // Fecha nacimiento
-                getCellDateTime(row, 11), // Fecha matrícula
-                getCellValue(row, 12), // Modo contrato
-                getCellValue(row, 13), // Modalidad estudio
-                getCellValue(row, 14), // Sede
-                getCellValue(row, 15), // Facultad
-                getCellValue(row, 16), // Programa
-                getCellInteger(row, 17), // Ciclo
-                getCellInteger(row, 18)  // Grupo
+                getCellValue(row, 8),      // Código estudiante
+                getCellValue(row, 9),      // Estudiante (apellidos nombres)
+                getCellValue(row, 10),     // Documento
+                getCellValue(row, 11),     // Correo personal
+                getCellValue(row, 13),     // Correo institucional
+                getCellValue(row, 12),     // Usuario
+                getCellValue(row, 14),     // Celular
+                getCellValue(row, 15),     // País
+                getCellValue(row, 16),     // Foto
+                getCellValue(row, 17),     // Religión
+                getCellDate(row, 18),      // Fecha nacimiento
+                getCellDateTime(row, 19),  // Fecha matrícula
+                getCellValue(row, 0),      // Modo contrato
+                getCellValue(row, 1),      // Modalidad estudio
+                getCellValue(row, 2),      // Sede
+                getCellValue(row, 3),      // Facultad
+                getCellValue(row, 4),      // Programa
+                getCellInteger(row, 5),    // Ciclo
+                getCellInteger(row, 6)     // Grupo
         );
     }
 
@@ -372,13 +379,29 @@ public class PersonaServiceImpl implements IPersonaService {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Personas");
 
-            // Header
+            // Header EN EL ORDEN CORRECTO
             Row headerRow = sheet.createRow(0);
             String[] headers = {
-                    "Código Estudiante", "Estudiante", "Documento", "Correo Personal",
-                    "Correo Institucional", "Usuario", "Celular", "País", "Foto",
-                    "Religión", "Fecha Nacimiento", "Fecha Matrícula", "Modo Contrato",
-                    "Modalidad Estudio", "Sede", "Facultad", "Programa", "Ciclo", "Grupo"
+                    "Modo contrato",           // 0
+                    "Modalidad estudio",       // 1
+                    "Sede",                    // 2
+                    "Unidad académica",        // 3
+                    "Programa estudio",        // 4
+                    "Ciclo",                   // 5
+                    "Grupo",                   // 6
+                    "id_persona",              // 7
+                    "Código estudiante",       // 8
+                    "Estudiante",              // 9
+                    "Documento",               // 10
+                    "Correo",                  // 11
+                    "Usuario",                 // 12
+                    "Correo Institucional",    // 13
+                    "Celular",                 // 14
+                    "Pais",                    // 15
+                    "Foto",                    // 16
+                    "Religión",                // 17
+                    "Fecha de nacimiento",     // 18
+                    "Fecha de matrícula"       // 19
             };
 
             for (int i = 0; i < headers.length; i++) {
@@ -386,29 +409,31 @@ public class PersonaServiceImpl implements IPersonaService {
                 cell.setCellValue(headers[i]);
             }
 
-            // Datos
+            // Datos EN EL ORDEN CORRECTO
             int rowNum = 1;
             for (Persona p : personas) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(p.getCodigoEstudiante());
-                row.createCell(1).setCellValue(p.getApellidos() + " " + p.getNombres());
-                row.createCell(2).setCellValue(p.getDocumentoIdentidad());
-                row.createCell(3).setCellValue(p.getCorreoPersonal());
-                row.createCell(4).setCellValue(p.getCorreoInstitucional());
-                row.createCell(5).setCellValue(p.getUsuarioLogin());
-                row.createCell(6).setCellValue(p.getCelular());
-                row.createCell(7).setCellValue(p.getPais());
-                row.createCell(8).setCellValue(p.getFotoUrl());
-                row.createCell(9).setCellValue(p.getReligion());
-                row.createCell(10).setCellValue(p.getFechaNacimiento() != null ? p.getFechaNacimiento().toString() : "");
-                row.createCell(11).setCellValue(p.getFechaMatricula() != null ? p.getFechaMatricula().toString() : "");
-                row.createCell(12).setCellValue(p.getModoContrato() != null ? p.getModoContrato().name() : "");
-                row.createCell(13).setCellValue(p.getModalidadEstudio() != null ? p.getModalidadEstudio().name() : "");
-                row.createCell(14).setCellValue(p.getSede());
-                row.createCell(15).setCellValue(p.getFacultad());
-                row.createCell(16).setCellValue(p.getProgramaEstudio());
-                row.createCell(17).setCellValue(p.getCiclo() != null ? p.getCiclo() : 0);
-                row.createCell(18).setCellValue(p.getGrupo() != null ? p.getGrupo() : 0);
+
+                row.createCell(0).setCellValue(p.getModoContrato() != null ? p.getModoContrato().name() : "");
+                row.createCell(1).setCellValue(p.getModalidadEstudio() != null ? p.getModalidadEstudio().name() : "");
+                row.createCell(2).setCellValue(p.getSede());
+                row.createCell(3).setCellValue(p.getFacultad());
+                row.createCell(4).setCellValue(p.getProgramaEstudio());
+                row.createCell(5).setCellValue(p.getCiclo() != null ? p.getCiclo() : 0);
+                row.createCell(6).setCellValue(p.getGrupo() != null ? p.getGrupo() : 0);
+                row.createCell(7).setCellValue(p.getIdPersona());
+                row.createCell(8).setCellValue(p.getCodigoEstudiante());
+                row.createCell(9).setCellValue(p.getApellidos() + " " + p.getNombres());
+                row.createCell(10).setCellValue(p.getDocumentoIdentidad());
+                row.createCell(11).setCellValue(p.getCorreoPersonal());
+                row.createCell(12).setCellValue(p.getUsuarioLogin());
+                row.createCell(13).setCellValue(p.getCorreoInstitucional());
+                row.createCell(14).setCellValue(p.getCelular());
+                row.createCell(15).setCellValue(p.getPais());
+                row.createCell(16).setCellValue(p.getFotoUrl());
+                row.createCell(17).setCellValue(p.getReligion());
+                row.createCell(18).setCellValue(p.getFechaNacimiento() != null ? p.getFechaNacimiento().toString() : "");
+                row.createCell(19).setCellValue(p.getFechaMatricula() != null ? p.getFechaMatricula().toString() : "");
             }
 
             workbook.write(out);
@@ -448,11 +473,26 @@ public class PersonaServiceImpl implements IPersonaService {
     }
 
     @Override
+    @Transactional
     public Persona actualizarPersona(Long idPersona, PersonaDto.CrearPersonaDto actualizarDto, Long modificadoPor) {
         Persona persona = personaRepository.findById(idPersona)
                 .orElseThrow(() -> new ModelNotFoundException("Persona no encontrada"));
 
-        // Actualizar TODOS los campos
+        // Validar duplicados (excepto si es el mismo registro)
+        Optional<Persona> personaDuplicadaDni = personaRepository.findByDocumentoIdentidad(actualizarDto.documentoIdentidad());
+        if (personaDuplicadaDni.isPresent() && !personaDuplicadaDni.get().getIdPersona().equals(idPersona)) {
+            throw new ModelNotFoundException("Ya existe otra persona con el DNI: " + actualizarDto.documentoIdentidad());
+        }
+
+        Optional<Persona> personaDuplicadaCodigo = personaRepository.findByCodigoEstudiante(actualizarDto.codigoEstudiante());
+        if (personaDuplicadaCodigo.isPresent() && !personaDuplicadaCodigo.get().getIdPersona().equals(idPersona)) {
+            throw new ModelNotFoundException("Ya existe otra persona con el código: " + actualizarDto.codigoEstudiante());
+        }
+
+        // Guardar código antiguo para verificar si cambió
+        String codigoAntiguo = persona.getCodigoEstudiante();
+
+        // Actualizar datos de Persona
         persona.setCodigoEstudiante(actualizarDto.codigoEstudiante());
         persona.setNombres(actualizarDto.nombres());
         persona.setApellidos(actualizarDto.apellidos());
@@ -475,14 +515,38 @@ public class PersonaServiceImpl implements IPersonaService {
         persona.setGrupo(actualizarDto.grupo());
         persona.setModificadoPor(modificadoPor);
 
+        // IMPORTANTE: Actualizar también el usuario asociado
         if (persona.getUsuarioId() != null) {
-            Usuario usuario = usuarioRepository.findById(persona.getUsuarioId()).orElse(null);
-            if (usuario != null) {
-                usuario.setUsuario(actualizarDto.usuarioLogin());
-                usuario.setCorreo(actualizarDto.correoInstitucional() != null ?
-                        actualizarDto.correoInstitucional() : actualizarDto.correoPersonal());
-                usuarioRepository.save(usuario);
+            Usuario usuario = usuarioRepository.findById(persona.getUsuarioId())
+                    .orElseThrow(() -> new ModelNotFoundException("Usuario asociado no encontrado"));
+
+            // Validar que el nuevo usuario no esté duplicado (excepto si es el mismo)
+            if (!usuario.getUsuario().equals(actualizarDto.usuarioLogin()) &&
+                    usuarioRepository.existsByUsuario(actualizarDto.usuarioLogin())) {
+                throw new ModelNotFoundException("El nombre de usuario ya está en uso: " + actualizarDto.usuarioLogin());
             }
+
+            // Actualizar datos del usuario
+            usuario.setUsuario(actualizarDto.usuarioLogin());
+
+            // Usar correo institucional si existe, sino el personal
+            String nuevoCorreo = actualizarDto.correoInstitucional() != null && !actualizarDto.correoInstitucional().isEmpty()
+                    ? actualizarDto.correoInstitucional()
+                    : actualizarDto.correoPersonal();
+
+            // Validar correo duplicado (excepto si es el mismo)
+            if (!usuario.getCorreo().equals(nuevoCorreo) &&
+                    usuarioRepository.existsByCorreo(nuevoCorreo)) {
+                throw new ModelNotFoundException("El correo ya está en uso: " + nuevoCorreo);
+            }
+
+            usuario.setCorreo(nuevoCorreo);
+
+            if (!codigoAntiguo.equals(actualizarDto.codigoEstudiante())) {
+                usuario.setContraseña(passwordEncoder.encode(actualizarDto.codigoEstudiante()));
+            }
+
+            usuarioRepository.save(usuario);
         }
 
         return personaRepository.save(persona);
